@@ -1,13 +1,14 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import helloRoute from "./routes/hello.route";
 import {routeError} from "./middleware/routeError";
+import authRoutes from './routes/auth'
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use('/api/', helloRoute)
+
+app.use('/api/auth', authRoutes)
 
 app.use(routeError);
 
