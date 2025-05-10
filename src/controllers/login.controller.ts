@@ -1,25 +1,24 @@
 import {Request, Response} from 'express';
 import logger from "../middleware/logger";
-import {User} from "../util/interface";
-import {users} from "../util/seed";
 import {loginService} from "../services/login.service";
-
+import jwt from "jsonwebtoken";
+import {JWT_SECRET} from "../middleware/auth.middleware";
+import {resolveErrorType} from "../util/helper";
 
 export const login = async (req: Request, res: Response) => {
     try {
         const {email, password} = req.body;
         if (!email || !password) throw new Error("missing credentials");
+
         const user = await loginService(email, password);
-        res.status(200).json(user);
-        logger.info(`${user} login success`)
+        const token = jwt.sign({userId: user.id, email: user.email}, JWT_SECRET, {expiresIn: "1h"});
+        res.status(200).json({token});
+        logger.info(`${user.email} login success`)
     } catch (err: unknown) {
         if (err instanceof Error) {
             logger.error(err.message);
-            if (err.message.includes('invalid') || err.message.includes('missing')) {
-                res.status(400).json({error: err.message});
-            } else {
-                res.status(500).json({error: err.message});
-            }
+            const errorType: number = resolveErrorType(err.message);
+            res.status(errorType).json({message: err.message});
         }
     }
 }

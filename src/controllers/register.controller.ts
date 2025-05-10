@@ -1,8 +1,7 @@
 import {Request, Response} from "express"
-import {User} from "../util/interface";
 import logger from "../middleware/logger";
-import {users} from "../util/seed";
 import {registerService} from "../services/register.service";
+import {resolveErrorType} from "../util/helper";
 
 export const register = async (req: Request, res: Response) => {
     try {
@@ -12,15 +11,12 @@ export const register = async (req: Request, res: Response) => {
 
         const user = await registerService(username, email, password);
         res.status(201).json(user);
-        logger.info(`new user registered: ${user}`);
+        logger.info(`new user registered: ${user.email}`);
     } catch (err: unknown) {
         if (err instanceof Error) {
             logger.error(err.message);
-            if (err.message.includes('invalid') || err.message.includes('missing')) {
-                res.status(400).json({error: err.message});
-            } else {
-                res.status(500).json({error: err.message});
-            }
+            const errorType: number = resolveErrorType(err.message);
+            res.status(errorType).json({message: err.message});
         }
     }
 }

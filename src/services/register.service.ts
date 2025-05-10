@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import {PrismaClient} from "../../generated/prisma";
 
 const prisma = new PrismaClient();
@@ -9,6 +10,7 @@ export const registerService = async (username: string, email: string, password:
     const existingUsername = await prisma.user.findUnique({where: {username}});
     if (existingUsername) throw new Error("username taken");
 
-    const newUser = await prisma.user.create({data:{username,email,password}});
-    return {username:newUser.username, email:newUser.email};
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    const newUser = await prisma.user.create({data: {username, email, password: hashedPassword}});
+    return {id: newUser.id, username: newUser.username, email: newUser.email};
 }

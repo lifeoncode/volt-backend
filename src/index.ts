@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+dotenv.config();
 import {routeError} from "./middleware/routeError";
 import authRoutes from './routes/auth'
 import addressCredentialRoute from "./routes/addressCredential.route";
@@ -21,6 +22,5 @@ app.use('/api/payment', paymentCredentialRoute);
 
 app.use(routeError);
 
-dotenv.config();
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`....Server started on ${PORT}....`))
