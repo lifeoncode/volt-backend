@@ -4,9 +4,11 @@ import {
     getAllPasswordCredentials, getSinglePasswordCredential,
     updatePasswordCredential
 } from "../controllers/passwordCredential.controller";
+import {authenticate} from "../middleware/auth.middleware";
 
 const router = Router();
 
+router.use(authenticate);
 router.post("/", createPasswordCredential);
 router.get("/", getAllPasswordCredentials);
 router.get("/:id", getSinglePasswordCredential);

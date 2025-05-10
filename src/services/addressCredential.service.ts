@@ -3,12 +3,12 @@ import {AddressCredential} from "../util/interface";
 
 const prisma = new PrismaClient();
 
-export const createAddressCredentialService = async ({label, city, street, state, town, zip_code, user}: AddressCredential) => {
+export const createAddressCredentialService = async (data: AddressCredential) => {
     const existingAddressCredential = await prisma.addressCredential.findFirst(
-        {where: {OR: [{label}, {street}]}});
+        {where: {OR: [{label: data.label}, {street: data.street}]}});
     if (existingAddressCredential) throw new Error("address already exists");
 
-    return prisma.addressCredential.create({data: {label, city, street, state, town, zip_code, user:{connect:{id:user}}}});
+    return prisma.addressCredential.create({data: {label:data.label, city:data.city, street:data.street, state:data.state, town:data.town, zip_code:data.zip_code, user:{connect:{id:data.user}}}});
 }
 
 export const getAllAddressCredentialsService = async (userId:number | undefined) => {
