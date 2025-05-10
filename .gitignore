@@ -61,6 +61,8 @@ jspm_packages/
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
+generated/prisma/
+
 # TypeScript cache
 *.tsbuildinfo
 
