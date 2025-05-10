@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import {PasswordCredential} from "../util/interface";
 import logger from "../middleware/logger";
-import {resolveErrorType} from "../util/helper";
+import {encryptPasswordCredential, resolveErrorType} from "../util/helper";
 import {
     createPasswordCredentialService, deletePasswordCredentialService,
     getAllPasswordCredentialsService, getSinglePasswordCredentialService, updatePasswordCredentialService
@@ -13,7 +13,9 @@ export const createPasswordCredential = async (req: Request, res: Response) => {
         const {service, email, username, password, notes}:PasswordCredential = req.body;
         if (!service || !email || !password) throw new Error("missing credentials");
 
-        const newPasswordCredential = await createPasswordCredentialService({service, email, password, user:userId, username, notes});
+        const {email:encryptedEmail, password:encryptedPassword} = encryptPasswordCredential({service, email, username, password, notes, user:userId});
+
+        const newPasswordCredential = await createPasswordCredentialService({service, email:encryptedEmail, password:encryptedPassword, user:userId, username, notes});
         res.status(201).json(newPasswordCredential);
         logger.info(`user: ${userId} created password credential: ${newPasswordCredential.id}`);
     } catch (err: unknown) {

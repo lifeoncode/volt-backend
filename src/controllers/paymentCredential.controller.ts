@@ -1,7 +1,7 @@
 import {Request, Response} from "express"
 import {PaymentCredential} from "../util/interface";
 import logger from "../middleware/logger";
-import {resolveErrorType} from "../util/helper";
+import {encryptPaymentCredential, resolveErrorType} from "../util/helper";
 import {
     createPaymentCredentialService, deletePaymentCredentialService,
     getAllPaymentCredentialsService,
@@ -15,7 +15,9 @@ export const createPaymentCredential = async (req: Request, res: Response) => {
         if (!card_holder || !card_number || !card_expiry || !security_code || !card_type) throw new Error("missing" +
             " credentials");
 
-        const newPaymentCredential = await createPaymentCredentialService({card_holder, card_number, card_expiry, security_code, card_type, user:userId, notes});
+        const {security_code:encryptedSecurityCode, card_number:encryptedCardNumber, card_expiry:encryptedCardExpiry} = encryptPaymentCredential({card_holder, card_number, card_expiry, security_code, card_type, notes, user:userId});
+
+        const newPaymentCredential = await createPaymentCredentialService({card_holder, card_number:encryptedCardNumber, card_expiry:encryptedCardExpiry, security_code:encryptedSecurityCode, card_type, user:userId, notes});
         res.status(201).json(newPaymentCredential);
         logger.info(`user: ${userId} created payment credential: ${newPaymentCredential.id}`);
     } catch (err: unknown) {

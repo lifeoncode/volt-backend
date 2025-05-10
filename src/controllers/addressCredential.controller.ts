@@ -1,6 +1,6 @@
 import {Request, RequestHandler, Response} from 'express';
 import logger from "../middleware/logger";
-import {resolveErrorType} from "../util/helper";
+import {encryptAddressCredential, resolveErrorType} from "../util/helper";
 import {
     createAddressCredentialService, deleteAddressCredentialService,
     getAllAddressCredentialsService,
@@ -14,7 +14,9 @@ export const createAddressCredential: RequestHandler = async (req: Request, res:
         const {label, city, street, state, zip_code, town}:AddressCredential = req.body;
         if (!label || !city || !street || !state || !zip_code) throw new Error("missing credentials");
 
-        const newAddressCredential = await createAddressCredentialService({label, city, street, state, town, user:userId, zip_code});
+        const {city:encryptedCity, street:encryptedStreet, zip_code:encryptedZipCode} = encryptAddressCredential({label, city, street, state, zip_code, town, user:userId});
+
+        const newAddressCredential = await createAddressCredentialService({label, city:encryptedCity, street:encryptedStreet, state, town, user:userId, zip_code:encryptedZipCode});
         res.status(201).json(newAddressCredential);
         logger.info(`user: ${userId} created address credential: ${newAddressCredential.id}`);
     } catch (err: unknown) {
