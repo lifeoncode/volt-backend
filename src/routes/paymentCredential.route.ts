@@ -4,9 +4,11 @@ import {
     getAllPaymentCredentials,
     getSinglePaymentCredential, updatePaymentCredential
 } from "../controllers/paymentCredential.controller";
+import {authenticate} from "../middleware/auth.middleware";
 
 const router = Router();
 
+router.use(authenticate)
 router.post("/", createPaymentCredential);
 router.get("/", getAllPaymentCredentials);
 router.get("/:id", getSinglePaymentCredential);
