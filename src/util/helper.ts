@@ -71,14 +71,29 @@ export const resolveErrorType = (errorMessage: string): number => {
 
 export const updateExistingCredential = (
   newCredential: AddressCredential | PasswordCredential | PaymentCredential,
-  oldCredential: AddressCredential | PasswordCredential | PaymentCredential
+  oldCredential: AddressCredential | PasswordCredential | PaymentCredential,
+  secretKey: string
 ) => {
   const credentials: string[] = [];
   const result: Record<string, any> = {};
+  const valuesToHide: string[] = [
+    "city",
+    "street",
+    "zip_code",
+    "password",
+    "email",
+    "security_code",
+    "card_number",
+    "card_exppiry",
+  ];
 
   for (let [key, value] of Object.entries(newCredential)) {
     if (value) {
-      credentials.push(`${key}:${value}`);
+      if (valuesToHide.includes(key)) {
+        credentials.push(`${key}:${encryptData(value, secretKey)}`);
+      } else {
+        credentials.push(`${key}:${value}`);
+      }
     }
   }
 

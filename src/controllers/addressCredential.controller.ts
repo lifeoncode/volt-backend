@@ -82,7 +82,7 @@ export const getSingleAddressCredential: RequestHandler = async (req: Request, r
   try {
     const userId: number | undefined = req.user?.userId;
     const { id } = req.params;
-    const credential = await getSingleAddressCredentialService(userId, Number(id));
+    const credential = await getSingleAddressCredentialService(Number(userId), Number(id));
 
     res.status(200).json(credential);
     logger.info(`user: ${userId} fetched single address credential: ${credential?.id}`);
@@ -105,12 +105,12 @@ export const updateAddressCredential: RequestHandler = async (req: Request, res:
     const newCredentialData = { label, city, street, state, zip_code, town };
 
     const { secret_key: secret } = await getUserService(Number(userId));
-    const existingCredential = await getSingleAddressCredentialService(userId, Number(id));
+    const existingCredential = await getSingleAddressCredentialService(Number(userId), Number(id));
 
     const decryptedCredential = decryptAddressCredential(existingCredential, secret);
-    const newCredential = updateExistingCredential(newCredentialData, decryptedCredential);
+    const newCredential = updateExistingCredential(newCredentialData, decryptedCredential, secret);
 
-    const updatedCredential = await updateAddressCredentialService(userId, Number(id), newCredential);
+    const updatedCredential = await updateAddressCredentialService(Number(userId), Number(id), newCredential);
     res.status(200).json(updatedCredential);
     logger.info(`user: ${userId} updated address credential: ${updatedCredential?.id}`);
   } catch (err: unknown) {
@@ -126,7 +126,7 @@ export const deleteAddressCredential: RequestHandler = async (req: Request, res:
   try {
     const userId: number | undefined = req.user?.userId;
     const { id } = req.params;
-    const deletedCredential = await deleteAddressCredentialService(userId, Number(id));
+    const deletedCredential = await deleteAddressCredentialService(Number(userId), Number(id));
 
     res.status(200).json(deletedCredential);
     logger.info(`user: ${userId} deleted address credential: ${deletedCredential}`);

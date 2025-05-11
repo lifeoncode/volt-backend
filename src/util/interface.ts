@@ -24,20 +24,28 @@ export interface AddressCredential {
 }
 
 export interface PasswordCredential {
-  user: any;
+  id?: number;
+  user?: any;
+  user_id?: number;
   service: string;
   email: string;
   password: string;
-  username?: string;
-  notes?: string;
+  username?: string | null;
+  notes?: string | null;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 }
 
 export interface PaymentCredential {
-  user: any;
+  id?: number;
+  user_id?: number;
+  user?: any;
   card_holder: string;
   card_number: string;
   card_expiry: string;
   security_code: string;
   card_type: string;
-  notes?: string;
+  notes?: string | null;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 }
