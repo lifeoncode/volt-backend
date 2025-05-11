@@ -1,68 +1,95 @@
-import {AddressCredential, PasswordCredential, PaymentCredential} from "./interface";
+import { AddressCredential, PasswordCredential, PaymentCredential } from "./interface";
 import CryptoJS from "crypto-js";
 
-const secretKey: string = process.env.CRYPTO_SECRET_KEY!;
-
 export const generateSecretKey = () => {
-    return crypto.randomBytes(32).toString('hex');
-}
-
-const encryptData = (data: string | undefined | null) => {
-    if (!data) throw new Error("No data provided for encryption");
-    return CryptoJS.AES.encrypt(data, secretKey).toString();
+  return CryptoJS.lib.WordArray.random(32).toString(CryptoJS.enc.Hex);
 };
 
-const decryptData = (data: string | undefined | null) => {
-    if (!data) throw new Error("No data provided for decryption");
-    const bytes = CryptoJS.AES.decrypt(data, secretKey);
-    return bytes.toString(CryptoJS.enc.Utf8);
+const encryptData = (data: string | undefined | null, secretKey: string) => {
+  if (!data) throw new Error("No data provided for encryption");
+  return CryptoJS.AES.encrypt(data, secretKey).toString();
 };
 
-export const encryptAddressCredential = (data:AddressCredential) => {
-    data.city = encryptData(data.city);
-    data.street = encryptData(data.street);
-    data.zip_code = encryptData(data.zip_code);
-    return data;
-}
+const decryptData = (data: string | undefined | null, secretKey: string) => {
+  if (!data) throw new Error("No data provided for decryption");
+  const bytes = CryptoJS.AES.decrypt(data, secretKey);
+  return bytes.toString(CryptoJS.enc.Utf8);
+};
 
-export const encryptPasswordCredential = (data:PasswordCredential) => {
-    data.password = encryptData(data.password);
-    data.email = encryptData(data.email);
-    return data;
-}
+export const encryptAddressCredential = (data: AddressCredential, secret: string) => {
+  data.city = encryptData(data.city, secret);
+  data.street = encryptData(data.street, secret);
+  data.zip_code = encryptData(data.zip_code, secret);
 
-export const encryptPaymentCredential = (data:PaymentCredential) => {
-    data.security_code = encryptData(data.security_code);
-    data.card_number = encryptData(data.card_number);
-    data.card_expiry = encryptData(data.card_expiry);
-    return data;
-}
+  return data;
+};
 
-export const decryptAddressCredential = (data:AddressCredential) => {
-    data.city = decryptData(data.city);
-    data.street = decryptData(data.street);
-    data.zip_code = decryptData(data.zip_code);
-    return data;
-}
+export const encryptPasswordCredential = (data: PasswordCredential, secret: string) => {
+  data.password = encryptData(data.password, secret);
+  data.email = encryptData(data.email, secret);
 
-export const decryptPasswordCredential = (data:PasswordCredential) => {
-    data.password = decryptData(data.password);
-    data.email = decryptData(data.email);
-    return data;
-}
+  return data;
+};
 
-export const decryptPaymentCredential = (data:PaymentCredential) => {
-    data.security_code = decryptData(data.security_code);
-    data.card_number = decryptData(data.card_number);
-    data.card_expiry = decryptData(data.card_expiry);
-    return data;
-}
+export const encryptPaymentCredential = (data: PaymentCredential, secret: string) => {
+  data.security_code = encryptData(data.security_code, secret);
+  data.card_number = encryptData(data.card_number, secret);
+  data.card_expiry = encryptData(data.card_expiry, secret);
+
+  return data;
+};
+
+export const decryptAddressCredential = (data: AddressCredential, secret: string) => {
+  data.city = decryptData(data.city, secret);
+  data.street = decryptData(data.street, secret);
+  data.zip_code = decryptData(data.zip_code, secret);
+
+  return data;
+};
+
+export const decryptPasswordCredential = (data: PasswordCredential, secret: string) => {
+  data.password = decryptData(data.password, secret);
+  data.email = decryptData(data.email, secret);
+
+  return data;
+};
+
+export const decryptPaymentCredential = (data: PaymentCredential, secret: string) => {
+  data.security_code = decryptData(data.security_code, secret);
+  data.card_number = decryptData(data.card_number, secret);
+  data.card_expiry = decryptData(data.card_expiry, secret);
+
+  return data;
+};
 
 export const resolveErrorType = (errorMessage: string): number => {
-    if (errorMessage.includes("missing") || errorMessage.includes("invalid")) {
-        return 400
+  if (errorMessage.includes("missing") || errorMessage.includes("invalid")) {
+    return 400;
+  }
+  return 500;
+};
+
+export const updateExistingCredential = (
+  newCredential: AddressCredential | PasswordCredential | PaymentCredential,
+  oldCredential: AddressCredential | PasswordCredential | PaymentCredential
+) => {
+  const credentials: string[] = [];
+  const result: Record<string, any> = {};
+
+  for (let [key, value] of Object.entries(newCredential)) {
+    if (value) {
+      credentials.push(`${key}:${value}`);
     }
-    return 500;
-}
+  }
 
+  credentials.forEach((credential) => {
+    const key = credential.split(":")[0];
+    const value = credential.split(":")[1];
 
+    if (key in oldCredential) {
+      result[key] = value;
+    }
+  });
+
+  return result;
+};
