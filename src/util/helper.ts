@@ -3,6 +3,10 @@ import CryptoJS from "crypto-js";
 
 const secretKey: string = process.env.CRYPTO_SECRET_KEY!;
 
+export const generateSecretKey = () => {
+    return crypto.randomBytes(32).toString('hex');
+}
+
 const encryptData = (data: string | undefined | null) => {
     if (!data) throw new Error("No data provided for encryption");
     return CryptoJS.AES.encrypt(data, secretKey).toString();

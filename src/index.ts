@@ -15,10 +15,10 @@ app.use(cors({
 }));
 app.use(express.json());
 
-app.use('/api/auth', authRoutes);
-app.use('/api/address', addressCredentialRoute);
-app.use('/api/password', passwordCredentialRoute);
-app.use('/api/payment', paymentCredentialRoute);
+app.use('/volt/api/auth', authRoutes);
+app.use('/volt/api/address', addressCredentialRoute);
+app.use('/volt/api/password', passwordCredentialRoute);
+app.use('/volt/api/payment', paymentCredentialRoute);
 
 app.use(routeError);
 

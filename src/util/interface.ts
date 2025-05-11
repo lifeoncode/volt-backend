@@ -2,6 +2,7 @@ export interface User {
     username: string,
     email: string;
     password: string;
+    secret_key: string;
 }
 
 export interface JWTPayload {
