@@ -14,12 +14,16 @@ export const getUserService = async (userId: number) => {
 
 export const updateUserService = async (userId: number, userData: any) => {
   await getUserService(userId);
-  prisma.user.update({ where: { id: userId }, data: userData });
+  await prisma.user.update({
+    where: { id: userId },
+    data: userData,
+  });
+  console.log(userData);
   return;
 };
 
 export const deleteUserService = async (userId: number) => {
   await getUserService(userId);
-  prisma.user.delete({ where: { id: userId } });
+  await prisma.user.delete({ where: { id: userId } });
   return;
 };

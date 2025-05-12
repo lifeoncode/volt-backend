@@ -3,6 +3,7 @@ import logger from "../middleware/logger";
 import { resolveErrorType } from "../util/helper";
 import { deleteUserService, getUserService, updateUserService } from "../services/user.service";
 import { User } from "../util/interface";
+import bcrypt from "bcryptjs";
 
 export const getUser = async (req: Request, res: Response) => {
   try {
@@ -27,7 +28,10 @@ export const updateUser = async (req: Request, res: Response) => {
     let newData: Record<string, any> = {};
     if (username) newData.username = username;
     if (email) newData.email = email;
-    if (password) newData.password = password;
+    if (password) {
+      const hashedPassword = bcrypt.hashSync(password, 10);
+      newData.password = hashedPassword;
+    }
 
     await updateUserService(Number(userId), newData);
     res.status(200).json({ message: "user updated" });
