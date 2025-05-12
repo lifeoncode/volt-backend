@@ -1,0 +1,55 @@
+import { Request, Response } from "express";
+import logger from "../middleware/logger";
+import { resolveErrorType } from "../util/helper";
+import { deleteUserService, getUserService, updateUserService } from "../services/user.service";
+import { User } from "../util/interface";
+
+export const getUser = async (req: Request, res: Response) => {
+  try {
+    const userId: number | undefined = req.user?.userId;
+    const userCredentials = await getUserService(Number(userId));
+    res.status(200).json(userCredentials);
+    logger.info(`user: ${userCredentials.email} fetched their user credentials`);
+  } catch (err) {
+    if (err instanceof Error) {
+      logger.error(err.message);
+      res.status(resolveErrorType(err.message)).json({ message: err.message });
+    }
+  }
+};
+
+export const updateUser = async (req: Request, res: Response) => {
+  try {
+    const userId: number | undefined = req.user?.userId;
+    const { username, email, password }: User = req.body;
+    if (!username && !email && !password) throw new Error("missing credentials");
+
+    let newData: Record<string, any> = {};
+    if (username) newData.username = username;
+    if (email) newData.email = email;
+    if (password) newData.password = password;
+
+    await updateUserService(Number(userId), newData);
+    res.status(200).json({ message: "user updated" });
+    logger.info(`user: ${userId} updated their user credentials`);
+  } catch (err) {
+    if (err instanceof Error) {
+      logger.error(err.message);
+      res.status(resolveErrorType(err.message)).json({ message: err.message });
+    }
+  }
+};
+
+export const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const userId: number | undefined = req.user?.userId;
+    await deleteUserService(Number(userId));
+    logger.info(`user: ${userId} deleted their account`);
+    res.status(200).json({ message: "user deleted" });
+  } catch (err) {
+    if (err instanceof Error) {
+      logger.error(err.message);
+      res.status(resolveErrorType(err.message)).json(err.message);
+    }
+  }
+};
