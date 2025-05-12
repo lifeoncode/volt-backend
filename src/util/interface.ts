@@ -1,8 +1,11 @@
 export interface User {
+  id?: number;
   username: string;
   email: string;
   password: string;
-  secret_key: string;
+  secret_key?: string;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }
 
 export interface JWTPayload {

@@ -2,7 +2,12 @@ import { PrismaClient } from "../../generated/prisma";
 
 const prisma = new PrismaClient();
 
-export const registerService = async (username: string, email: string, password: string, secret: string) => {
+export const registerService = async (
+  username: string,
+  email: string,
+  password: string,
+  secret: string
+) => {
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) throw new Error("user already exists");
 
