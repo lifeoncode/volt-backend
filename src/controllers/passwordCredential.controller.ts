@@ -51,6 +51,12 @@ export const getAllPasswordCredentials = async (req: Request, res: Response) => 
   try {
     const userId: number | undefined = req.user?.userId;
     const passwordCredentials = await getAllPasswordCredentialsService(userId);
+
+    const { secret_key: secret } = await getUserService(Number(userId));
+    for (let credential of passwordCredentials) {
+      decryptPasswordCredential(credential, secret);
+    }
+
     res.status(200).json(passwordCredentials);
     logger.info(`user: ${userId} fetched all password credentials`);
   } catch (err: unknown) {
@@ -67,6 +73,10 @@ export const getSinglePasswordCredential = async (req: Request, res: Response) =
     const userId: number | undefined = req.user?.userId;
     const { id } = req.params;
     const credential = await getSinglePasswordCredentialService(Number(userId), Number(id));
+
+    const { secret_key: secret } = await getUserService(Number(userId));
+    decryptPasswordCredential(credential, secret);
+
     res.status(200).json(credential);
     logger.info(`user: ${userId} fetched single password credential: ${credential?.id}`);
   } catch (err: unknown) {

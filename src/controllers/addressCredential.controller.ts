@@ -67,6 +67,11 @@ export const getAllAddressCredentials: RequestHandler = async (req: Request, res
     const userId: number | undefined = req.user?.userId;
     const addressCredentials = await getAllAddressCredentialsService(userId);
 
+    const { secret_key: secret } = await getUserService(Number(userId));
+    for (let credential of addressCredentials) {
+      decryptAddressCredential(credential, secret);
+    }
+
     res.status(200).json(addressCredentials);
     logger.info(`user: ${userId} fetched all address credentials`);
   } catch (err: unknown) {
@@ -83,6 +88,9 @@ export const getSingleAddressCredential: RequestHandler = async (req: Request, r
     const userId: number | undefined = req.user?.userId;
     const { id } = req.params;
     const credential = await getSingleAddressCredentialService(Number(userId), Number(id));
+
+    const { secret_key: secret } = await getUserService(Number(userId));
+    decryptAddressCredential(credential, secret);
 
     res.status(200).json(credential);
     logger.info(`user: ${userId} fetched single address credential: ${credential?.id}`);
