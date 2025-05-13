@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
 import { routeError } from "./middleware/routeError";
-import authRoutes from "./routes/auth";
+import authRoutes from "./routes/auth.route";
 import addressCredentialRoutes from "./routes/addressCredential.route";
 import passwordCredentialRoutes from "./routes/passwordCredential.route";
 import paymentCredentialRoutes from "./routes/paymentCredential.route";
