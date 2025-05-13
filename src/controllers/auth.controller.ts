@@ -5,6 +5,8 @@ import { registerService, loginService, recoverService } from "../services/auth.
 import logger from "../middleware/logger";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../middleware/auth.middleware";
+import path from "node:path";
+import fs from "node:fs";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -58,6 +60,27 @@ export const recover = async (req: Request, res: Response) => {
 
     res.status(200).json({ message: `recovery email sent` });
   } catch (err: unknown) {
+    if (err instanceof Error) {
+      logger.error(err.message);
+      const errorType: number = resolveErrorType(err.message);
+      res.status(errorType).json({ message: err.message });
+    }
+  }
+};
+
+export const validateRecovery = async (req: Request, res: Response) => {
+  try {
+    const { otp } = req.body;
+    if (!otp) throw new Error("OTP required");
+
+    const filePath = path.join(__dirname, "../data", "user", "recovery.txt");
+    const fileData = fs.readFileSync(filePath, "utf-8");
+    const storedeOTP = fileData.split(" - ")[1].trim();
+    if (otp.trim() !== storedeOTP) throw new Error("Invalid otp");
+
+    res.status(200).json({ message: "valid otp" });
+    logger.info(fileData);
+  } catch (err) {
     if (err instanceof Error) {
       logger.error(err.message);
       const errorType: number = resolveErrorType(err.message);

@@ -22,6 +22,11 @@ export const updateUserService = async (userId: number, userData: any) => {
   return;
 };
 
+export const updateUserPasswordService = async (email: string, newPassword: string) => {
+  const updatedUser = await prisma.user.update({ where: { email }, data: { password: newPassword } });
+  return updatedUser;
+};
+
 export const deleteUserService = async (userId: number) => {
   await getUserService(userId);
   await prisma.user.delete({ where: { id: userId } });

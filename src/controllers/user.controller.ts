@@ -1,7 +1,12 @@
 import { Request, Response } from "express";
 import logger from "../middleware/logger";
 import { resolveErrorType } from "../util/helper";
-import { deleteUserService, getUserService, updateUserService } from "../services/user.service";
+import {
+  deleteUserService,
+  getUserService,
+  updateUserPasswordService,
+  updateUserService,
+} from "../services/user.service";
 import { User } from "../util/interface";
 import bcrypt from "bcryptjs";
 
@@ -54,6 +59,25 @@ export const deleteUser = async (req: Request, res: Response) => {
     if (err instanceof Error) {
       logger.error(err.message);
       res.status(resolveErrorType(err.message)).json(err.message);
+    }
+  }
+};
+
+export const updateUserPassword = async (req: Request, res: Response) => {
+  try {
+    const { otp, email, password } = req.body;
+    if (!otp || !email || !password) throw new Error("missing credentials");
+    if (password.length < 8) throw new Error("invalid password length");
+
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    const updatedUser = await updateUserPasswordService(email, hashedPassword);
+
+    res.status(200).json(updatedUser);
+    logger.info(`user: ${email} changed their password`);
+  } catch (err) {
+    if (err instanceof Error) {
+      logger.error(err.message);
+      res.status(resolveErrorType(err.message)).json({ message: err.message });
     }
   }
 };
