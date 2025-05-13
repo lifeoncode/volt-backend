@@ -1,14 +1,16 @@
 import { Request, Response } from "express";
-import { resolveErrorType } from "../util/helper";
+import { resolveErrorType, sendEmail } from "../util/helper";
 import logger from "../middleware/logger";
 
 export const recover = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
-    if (!email) {
-      res.status(400).json("email required");
-    }
-    res.status(200).json({ message: `an account recovery email has been sent to ${email}` });
+    if (!email) throw new Error("email required");
+
+    const emailSent = await sendEmail(email);
+    if (!emailSent) throw new Error("Could not send email");
+
+    res.status(200).json({ message: `recovery email sent` });
   } catch (err: unknown) {
     if (err instanceof Error) {
       logger.error(err.message);
