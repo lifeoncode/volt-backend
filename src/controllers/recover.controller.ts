@@ -1,11 +1,14 @@
 import { Request, Response } from "express";
 import { resolveErrorType, sendEmail } from "../util/helper";
 import logger from "../middleware/logger";
+import { recoverService } from "../services/recover.service";
 
 export const recover = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
     if (!email) throw new Error("email required");
+
+    await recoverService(email);
 
     const emailSent = await sendEmail(email);
     if (!emailSent) throw new Error("Could not send email");
