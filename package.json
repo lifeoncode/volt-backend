@@ -33,7 +33,9 @@
   },
   "dependencies": {
     "@prisma/client": "^6.7.0",
+    "@types/cookie-parser": "^1.4.8",
     "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "crypto-js": "^4.2.0",
     "dotenv": "^16.5.0",

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { login, register, recover, validateRecovery } from "../controllers/auth.controller";
+import { login, register, recover, validateRecovery, refreshToken } from "../controllers/auth.controller";
 import { updateUserPassword } from "../controllers/user.controller";
 
 const router = Router();
@@ -9,5 +9,6 @@ router.post("/register", register);
 router.post("/recover", recover);
 router.post("/recover/validate", validateRecovery);
 router.post("/recover/reset", updateUserPassword);
+router.post("/refresh-token", refreshToken);
 
 export default router;

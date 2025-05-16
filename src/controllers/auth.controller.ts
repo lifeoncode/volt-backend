@@ -4,9 +4,10 @@ import bcrypt from "bcryptjs";
 import { registerService, loginService, recoverService } from "../services/auth.service";
 import logger from "../middleware/logger";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../middleware/auth.middleware";
+import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from "../middleware/auth.middleware";
 import path from "node:path";
 import fs from "node:fs";
+import { JWTPayload } from "../util/interface";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -35,10 +36,40 @@ export const login = async (req: Request, res: Response) => {
     if (!email || !password) throw new Error("missing credentials");
 
     const user = await loginService(email, password);
-    const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: "1h" });
+    const accessToken = jwt.sign({ userId: user.id, email: user.email }, JWT_ACCESS_SECRET, { expiresIn: "15m" });
+    const refreshToken = jwt.sign({ userId: user.id, email: user.email }, JWT_REFRESH_SECRET, { expiresIn: "7d" });
 
-    res.status(200).json({ token });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({ accessToken });
     logger.info(`${user.email} login success`);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      logger.error(err.message);
+      const errorType: number = resolveErrorType(err.message);
+      res.status(errorType).json({ message: err.message });
+    }
+  }
+};
+
+export const refreshToken = async (req: Request, res: Response) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) throw new Error("No refresh token found in cookies");
+
+    req.user = jwt.verify(refreshToken, JWT_REFRESH_SECRET) as JWTPayload;
+    const accessToken = jwt.sign({ userId: req.user.userId, email: req.user.email }, JWT_ACCESS_SECRET, {
+      expiresIn: "15m",
+    });
+
+    res.status(200).json({ accessToken });
+    logger.info("new access token generated");
   } catch (err: unknown) {
     if (err instanceof Error) {
       logger.error(err.message);
