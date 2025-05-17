@@ -21,11 +21,11 @@ export const register = async (req: Request, res: Response) => {
 
     res.status(201).json(user);
     logger.info(`new user registered: ${user.email}`);
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      logger.error(err.message);
-      const errorType: number = resolveErrorType(err.message);
-      res.status(errorType).json({ message: err.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      logger.error(error.message);
+      const errorType: number = resolveErrorType(error.message);
+      res.status(errorType).json(error.message);
     }
   }
 };
@@ -49,11 +49,11 @@ export const login = async (req: Request, res: Response) => {
 
     res.status(200).json({ accessToken });
     logger.info(`${user.email} login success`);
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      logger.error(err.message);
-      const errorType: number = resolveErrorType(err.message);
-      res.status(errorType).json({ message: err.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      logger.error(error.message);
+      const errorType: number = resolveErrorType(error.message);
+      res.status(errorType).json(error.message);
     }
   }
 };
@@ -70,11 +70,11 @@ export const refreshToken = async (req: Request, res: Response) => {
 
     res.status(200).json({ accessToken });
     logger.info("new access token generated");
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      logger.error(err.message);
-      const errorType: number = resolveErrorType(err.message);
-      res.status(errorType).json({ message: err.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      logger.error(error.message);
+      const errorType: number = resolveErrorType(error.message);
+      res.status(errorType).json(error.message);
     }
   }
 };
@@ -90,11 +90,11 @@ export const recover = async (req: Request, res: Response) => {
     if (!emailSent) throw new Error("Could not send email");
 
     res.status(200).json({ message: `recovery email sent` });
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      logger.error(err.message);
-      const errorType: number = resolveErrorType(err.message);
-      res.status(errorType).json({ message: err.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      logger.error(error.message);
+      const errorType: number = resolveErrorType(error.message);
+      res.status(errorType).json(error.message);
     }
   }
 };
@@ -111,11 +111,11 @@ export const validateRecovery = async (req: Request, res: Response) => {
 
     res.status(200).json({ message: "valid otp" });
     logger.info(fileData);
-  } catch (err) {
-    if (err instanceof Error) {
-      logger.error(err.message);
-      const errorType: number = resolveErrorType(err.message);
-      res.status(errorType).json({ message: err.message });
+  } catch (error) {
+    if (error instanceof Error) {
+      logger.error(error.message);
+      const errorType: number = resolveErrorType(error.message);
+      res.status(errorType).json(error.message);
     }
   }
 };
