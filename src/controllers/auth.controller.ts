@@ -8,6 +8,7 @@ import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from "../middleware/auth.middle
 import path from "node:path";
 import fs from "node:fs";
 import { JWTPayload } from "../util/interface";
+import { getUserService } from "../services/user.service";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -47,7 +48,7 @@ export const login = async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(200).json({ accessToken });
+    res.status(200).json({ username: user.username, email: user.email, token: accessToken });
     logger.info(`${user.email} login success`);
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -68,7 +69,9 @@ export const refreshToken = async (req: Request, res: Response) => {
       expiresIn: "15m",
     });
 
-    res.status(200).json({ accessToken });
+    const user = await getUserService(Number(req.user.userId));
+
+    res.status(200).json({ username: user.username, email: user.email, token: accessToken });
     logger.info("new access token generated");
   } catch (error: unknown) {
     if (error instanceof Error) {
