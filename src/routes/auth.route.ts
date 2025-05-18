@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { login, register, recover, validateRecovery, refreshToken } from "../controllers/auth.controller";
+import { login, logout, register, recover, validateRecovery, refreshToken } from "../controllers/auth.controller";
 import { updateUserPassword } from "../controllers/user.controller";
 
 const router = Router();
 
 router.post("/login", login);
+router.post("/logout", logout);
 router.post("/register", register);
 router.post("/recover", recover);
 router.post("/recover/validate", validateRecovery);

@@ -59,6 +59,26 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
+export const logout = async (req: Request, res: Response) => {
+  try {
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+      path: "/",
+    });
+
+    res.status(200).json({ message: "logged out" });
+    logger.info(`${req.user?.email} logout success`);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      logger.error(error.message);
+      const errorType: number = resolveErrorType(error.message);
+      res.status(errorType).json(error.message);
+    }
+  }
+};
+
 export const refreshToken = async (req: Request, res: Response) => {
   try {
     const refreshToken = req.cookies.refreshToken;
