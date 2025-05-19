@@ -16,6 +16,7 @@ model User {
   email              String               @unique
   password           String
   secret_key         String
+  recovery_otp       String?
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
   PasswordCredential PasswordCredential[]
