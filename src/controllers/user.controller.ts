@@ -71,9 +71,9 @@ export const resetUserPassword = async (req: Request, res: Response) => {
     if (password.length < 8) throw new Error("invalid password length");
 
     const hashedPassword = bcrypt.hashSync(password, 10);
-    const updatedUser = await updateUserPasswordService(email, hashedPassword);
+    await updateUserPasswordService(email, hashedPassword);
 
-    res.status(200).json(updatedUser);
+    res.status(200).json({ message: "password reset successful" });
     logger.info(`user: ${email} changed their password`);
   } catch (err) {
     if (err instanceof Error) {

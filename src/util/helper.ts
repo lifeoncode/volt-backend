@@ -141,8 +141,8 @@ export const sendEmail = async (email: string): Promise<boolean> => {
     port: 587,
     secure: false,
     auth: {
-      user: "nduduzo@yellogarden.co.za",
-      pass: "d2zX*!v((x.-",
+      user: "volt@yellogarden.co.za",
+      pass: "gc2uk44+vZ&D",
     },
     tls: {
       rejectUnauthorized: false,
@@ -164,7 +164,7 @@ export const sendEmail = async (email: string): Promise<boolean> => {
 `;
 
   const mailOptions = {
-    from: "nduduzo@yellogarden.co.za",
+    from: "volt@yellogarden.co.za",
     to: email,
     subject: "Volt account recovery",
     html: emailContent,

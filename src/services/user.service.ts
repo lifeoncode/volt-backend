@@ -23,6 +23,10 @@ export const updateUserService = async (userId: number, userData: any) => {
 };
 
 export const updateUserPasswordService = async (email: string, newPassword: string) => {
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+  if (!user) throw new Error("user not found");
   const updatedUser = await prisma.user.update({ where: { email }, data: { password: newPassword } });
   return updatedUser;
 };
