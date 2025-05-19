@@ -18,7 +18,7 @@ export const updateUserService = async (userId: number, userData: any) => {
     where: { id: userId },
     data: userData,
   });
-  console.log(userData);
+
   return;
 };
 
@@ -29,6 +29,10 @@ export const updateUserPasswordService = async (email: string, newPassword: stri
 
 export const deleteUserService = async (userId: number) => {
   await getUserService(userId);
+  await prisma.addressCredential.deleteMany({ where: { user_id: userId } });
+  await prisma.passwordCredential.deleteMany({ where: { user_id: userId } });
+  await prisma.paymentCredential.deleteMany({ where: { user_id: userId } });
   await prisma.user.delete({ where: { id: userId } });
+
   return;
 };
