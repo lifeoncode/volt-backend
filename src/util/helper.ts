@@ -2,8 +2,7 @@ import { AddressCredential, PasswordCredential, PaymentCredential } from "./inte
 import CryptoJS from "crypto-js";
 import nodemailer from "nodemailer";
 import logger from "../middleware/logger";
-import path from "node:path";
-import fs from "node:fs";
+import { storeRecoveryOTPService } from "../services/auth.service";
 
 export const generateSecretKey = () => {
   return CryptoJS.lib.WordArray.random(32).toString(CryptoJS.enc.Hex);
@@ -113,29 +112,16 @@ export const updateExistingCredential = (
   return result;
 };
 
-const storeFile = (filePath: string, fileData: string) => {
-  try {
-    fs.writeFileSync(filePath, fileData);
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    }
-  }
-};
-
-const generateOTP = (email: string): string => {
+export const generateOTP = (): string => {
   let otp = "";
   for (let i = 0; i < 4; i++) {
     otp += Math.floor(Math.random() * 10);
   }
 
-  const filePath = path.join(__dirname, "../data", "user", "recovery.txt");
-  storeFile(filePath, `${email} - ${otp}`);
-
   return otp;
 };
 
-export const sendEmail = async (email: string): Promise<boolean> => {
+export const sendEmail = async (email: string, otp: string): Promise<boolean> => {
   const transporter = nodemailer.createTransport({
     host: "mail.yellogarden.co.za",
     port: 587,
@@ -154,9 +140,7 @@ export const sendEmail = async (email: string): Promise<boolean> => {
     <h2 style="color:rgb(73, 24, 250);">Recover your account</h2>
     <p>Hi there,</p>
     <p>Looks like you're trying to recover your account for some reason. Here's your recovery pin:</p>
-    <div style="font-size:24px; font-weight:900; background-color:#eee; padding:5px 10px; border-radius:5px; display:inline-block;">${generateOTP(
-      email
-    )}</div>
+    <div style="font-size:24px; font-weight:900; background-color:#eee; padding:5px 10px; border-radius:5px; display:inline-block;">${otp}</div>
     <p style="margin-top: 20px;">If you didn't request this, ignore this email.</p>
     <hr style="margin: 20px 0;">
     <p style="font-size: 12px; color: #999;">This is an automated email from Volt, please do not reply.</p>

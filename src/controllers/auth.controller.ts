@@ -1,7 +1,13 @@
 import { Request, Response } from "express";
-import { generateSecretKey, resolveErrorType, sendEmail } from "../util/helper";
+import { generateOTP, generateSecretKey, resolveErrorType, sendEmail } from "../util/helper";
 import bcrypt from "bcryptjs";
-import { registerService, loginService, recoverService } from "../services/auth.service";
+import {
+  registerService,
+  loginService,
+  recoverService,
+  verifyOTPService,
+  storeRecoveryOTPService,
+} from "../services/auth.service";
 import logger from "../middleware/logger";
 import jwt from "jsonwebtoken";
 import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from "../middleware/auth.middleware";
@@ -108,8 +114,10 @@ export const recover = async (req: Request, res: Response) => {
     if (!email) throw new Error("email required");
 
     await recoverService(email);
+    const otp = await storeRecoveryOTPService(email, generateOTP());
+    if (!otp) throw new Error("could not store otp");
 
-    const emailSent = await sendEmail(email);
+    const emailSent = await sendEmail(email, otp as string);
     if (!emailSent) throw new Error("Could not send email");
 
     res.status(200).json({ message: `recovery email sent` });
@@ -124,16 +132,13 @@ export const recover = async (req: Request, res: Response) => {
 
 export const validateRecovery = async (req: Request, res: Response) => {
   try {
-    const { otp } = req.body;
-    if (!otp) throw new Error("OTP required");
+    const { email, otp } = req.body;
+    if (!email || !otp) throw new Error("missing credentials");
 
-    const filePath = path.join(__dirname, "../data", "user", "recovery.txt");
-    const fileData = fs.readFileSync(filePath, "utf-8");
-    const storedeOTP = fileData.split(" - ")[1].trim();
-    if (otp.trim() !== storedeOTP) throw new Error("Invalid otp");
+    const verified = await verifyOTPService(email, otp);
 
-    res.status(200).json({ message: "valid otp" });
-    logger.info(fileData);
+    res.status(200).json(verified);
+    logger.info(verified);
   } catch (error) {
     if (error instanceof Error) {
       logger.error(error.message);
