@@ -1,20 +1,28 @@
-import {Router} from 'express';
+import { Router } from "express";
 import {
-    createAddressCredential,
-    getAllAddressCredentials,
-    getSingleAddressCredential,
-    updateAddressCredential,
-    deleteAddressCredential
+  createAddressCredential,
+  getAllAddressCredentials,
+  getSingleAddressCredential,
+  updateAddressCredential,
+  deleteAddressCredential,
 } from "../controllers/addressCredential.controller";
-import {authenticate} from "../middleware/auth.middleware";
+import { authenticate } from "../middleware/auth.middleware";
 
 const router = Router();
 
-router.use(authenticate)
+/**
+ * @routes {AddressCredential}
+ *
+ * @description
+ * AddressCredential specific routing
+ *
+ * @requires user authentication
+ */
+router.use(authenticate);
 router.post("/", createAddressCredential);
-router.get('/', getAllAddressCredentials);
-router.get('/:id', getSingleAddressCredential);
-router.put('/:id', updateAddressCredential);
-router.delete('/:id', deleteAddressCredential);
+router.get("/", getAllAddressCredentials);
+router.get("/:id", getSingleAddressCredential);
+router.put("/:id", updateAddressCredential);
+router.delete("/:id", deleteAddressCredential);
 
 export default router;

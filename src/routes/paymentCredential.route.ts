@@ -1,14 +1,24 @@
-import {Router} from "express";
+import { Router } from "express";
 import {
-    createPaymentCredential, deletePaymentCredential,
-    getAllPaymentCredentials,
-    getSinglePaymentCredential, updatePaymentCredential
+  createPaymentCredential,
+  deletePaymentCredential,
+  getAllPaymentCredentials,
+  getSinglePaymentCredential,
+  updatePaymentCredential,
 } from "../controllers/paymentCredential.controller";
-import {authenticate} from "../middleware/auth.middleware";
+import { authenticate } from "../middleware/auth.middleware";
 
 const router = Router();
 
-router.use(authenticate)
+/**
+ * @routes {PaymentCredential}
+ *
+ * @description
+ * PaymentCredential specific routing
+ *
+ * @requires user authentication
+ */
+router.use(authenticate);
 router.post("/", createPaymentCredential);
 router.get("/", getAllPaymentCredentials);
 router.get("/:id", getSinglePaymentCredential);

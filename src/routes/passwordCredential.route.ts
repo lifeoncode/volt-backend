@@ -1,13 +1,23 @@
-import {Router} from "express";
+import { Router } from "express";
 import {
-    createPasswordCredential, deletePasswordCredential,
-    getAllPasswordCredentials, getSinglePasswordCredential,
-    updatePasswordCredential
+  createPasswordCredential,
+  deletePasswordCredential,
+  getAllPasswordCredentials,
+  getSinglePasswordCredential,
+  updatePasswordCredential,
 } from "../controllers/passwordCredential.controller";
-import {authenticate} from "../middleware/auth.middleware";
+import { authenticate } from "../middleware/auth.middleware";
 
 const router = Router();
 
+/**
+ * @routes {PasswordCredential}
+ *
+ * @description
+ * PasswordCredential specific routing
+ *
+ * @requires user authentication
+ */
 router.use(authenticate);
 router.post("/", createPasswordCredential);
 router.get("/", getAllPasswordCredentials);
