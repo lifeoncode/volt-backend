@@ -16,6 +16,20 @@ import {
 import { AddressCredential } from "../util/interface";
 import { getUserService } from "../services/user.service";
 
+/**
+ * @controller createAddressCredential
+ *
+ * @description
+ * Handles the creation of a new address credential for the authenticated user.
+ *
+ * @param {Request} req - Express request object. Expects an object as AddressCredential in req.body and userId in req.user
+ * @param {Response} res - Express response object. Responds with the created object or an error
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the creation of a new address credential with the userId on success. Logs the error message on failure.
+ */
 export const createAddressCredential: RequestHandler = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: number | undefined = req.user?.userId;
@@ -62,6 +76,20 @@ export const createAddressCredential: RequestHandler = async (req: Request, res:
   }
 };
 
+/**
+ * @controller getAllAddressCredentials
+ *
+ * @description
+ * Handles the retrieval of all created address credentials for the authenticated user.
+ *
+ * @param {Request} req - Express request object. Expects userId in req.user
+ * @param {Response} res - Express response object. Responds with all address credentials or an error
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the retrieval of address credentials with the userId on success. Logs the error message on failure.
+ */
 export const getAllAddressCredentials: RequestHandler = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: number | undefined = req.user?.userId;
@@ -83,6 +111,20 @@ export const getAllAddressCredentials: RequestHandler = async (req: Request, res
   }
 };
 
+/**
+ * @controller getSingleAddressCredential
+ *
+ * @description
+ * Handles the retrieval of a specific address credential for the authenticated user.
+ *
+ * @param {Request} req - Express request object. Expects userId in req.user and id in req.params
+ * @param {Response} res - Express response object. Responds with a single address credential or an error
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the retrieval of address credential with the userId on success. Logs the error message on failure.
+ */
 export const getSingleAddressCredential: RequestHandler = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: number | undefined = req.user?.userId;
@@ -103,6 +145,20 @@ export const getSingleAddressCredential: RequestHandler = async (req: Request, r
   }
 };
 
+/**
+ * @controller updateAddressCredential
+ *
+ * @description
+ * Handles the updating of a specific address credential for the authenticated user.
+ *
+ * @param {Request} req - Express request object. Expects userId in req.user, id in req.params and attribute(s) that match AddressCredential in req.body
+ * @param {Response} res - Express response object. Responds with a single address credential or an error
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the updating of address credential with the userId on success. Logs the error message on failure.
+ */
 export const updateAddressCredential: RequestHandler = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: number | undefined = req.user?.userId;
@@ -130,6 +186,20 @@ export const updateAddressCredential: RequestHandler = async (req: Request, res:
   }
 };
 
+/**
+ * @controller deleteAddressCredential
+ *
+ * @description
+ * Handles the deletion of a specific address credential for the authenticated user.
+ *
+ * @param {Request} req - Express request object. Expects userId in req.user and id in req.params
+ * @param {Response} res - Express response object. Responds with a single address credential or an error
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the deletion of address credential with the userId on success. Logs the error message on failure.
+ */
 export const deleteAddressCredential: RequestHandler = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: number | undefined = req.user?.userId;

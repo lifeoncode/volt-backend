@@ -16,7 +16,21 @@ import {
 } from "../services/paymentCredential.service";
 import { getUserService } from "../services/user.service";
 
-export const createPaymentCredential = async (req: Request, res: Response) => {
+/**
+ * @controller createPaymentCredential
+ *
+ * @description
+ * Handles the creation of a new payment credential for the authenticated user.
+ *
+ * @param {Request} req - Express request object. Expects an object as PaymentCredential in req.body and userId in req.user
+ * @param {Response} res - Express response object. Responds with the created object or an error
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the creation of a new payment credential with the userId on success. Logs the error message on failure.
+ */
+export const createPaymentCredential = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: number | undefined = req.user?.userId;
     const { card_holder, card_number, card_expiry, security_code, card_type, notes }: PaymentCredential = req.body;
@@ -53,7 +67,21 @@ export const createPaymentCredential = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllPaymentCredentials = async (req: Request, res: Response) => {
+/**
+ * @controller getAllPaymentCredentials
+ *
+ * @description
+ * Handles the retrieval of all created payment credentials for the authenticated user.
+ *
+ * @param {Request} req - Express request object. Expects userId in req.user
+ * @param {Response} res - Express response object. Responds with all payment credentials or an error
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the retrieval of payment credentials with the userId on success. Logs the error message on failure.
+ */
+export const getAllPaymentCredentials = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: number | undefined = req.user?.userId;
     const paymentCredentials = await getAllPaymentCredentialsService(userId);
@@ -74,7 +102,21 @@ export const getAllPaymentCredentials = async (req: Request, res: Response) => {
   }
 };
 
-export const getSinglePaymentCredential = async (req: Request, res: Response) => {
+/**
+ * @controller getSinglePaymentCredential
+ *
+ * @description
+ * Handles the retrieval of a specific payment credential for the authenticated user.
+ *
+ * @param {Request} req - Express request object. Expects userId in req.user and id in req.params
+ * @param {Response} res - Express response object. Responds with a single payment credential or an error
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the retrieval of payment credential with the userId on success. Logs the error message on failure.
+ */
+export const getSinglePaymentCredential = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: number | undefined = req.user?.userId;
     const { id } = req.params;
@@ -94,7 +136,21 @@ export const getSinglePaymentCredential = async (req: Request, res: Response) =>
   }
 };
 
-export const updatePaymentCredential = async (req: Request, res: Response) => {
+/**
+ * @controller updatePaymentCredential
+ *
+ * @description
+ * Handles the updating of a specific payment credential for the authenticated user.
+ *
+ * @param {Request} req - Express request object. Expects userId in req.user, id in req.params and attribute(s) that match PaymentCredential in req.body
+ * @param {Response} res - Express response object. Responds with a single payment credential or an error
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the updating of payment credential with the userId on success. Logs the error message on failure.
+ */
+export const updatePaymentCredential = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: number | undefined = req.user?.userId;
     const { id } = req.params;
@@ -123,7 +179,21 @@ export const updatePaymentCredential = async (req: Request, res: Response) => {
   }
 };
 
-export const deletePaymentCredential = async (req: Request, res: Response) => {
+/**
+ * @controller deletePaymentCredential
+ *
+ * @description
+ * Handles the deletion of a specific payment credential for the authenticated user.
+ *
+ * @param {Request} req - Express request object. Expects userId in req.user and id in req.params
+ * @param {Response} res - Express response object. Responds with a single payment credential or an error
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the deletion of payment credential with the userId on success. Logs the error message on failure.
+ */
+export const deletePaymentCredential = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: number | undefined = req.user?.userId;
     const { id } = req.params;
