@@ -5,9 +5,11 @@ import { resetUserPassword } from "../controllers/user.controller";
 const router = Router();
 
 /**
+ * @routes {Login, Logout, Register, Recover, Validate, Reset, Refresh}
+ *
+ * @description
  * Auth related routing
  */
-
 router.post("/login", login);
 router.post("/logout", logout);
 router.post("/register", register);
