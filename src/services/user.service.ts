@@ -1,5 +1,4 @@
 import { PrismaClient } from "../../generated/prisma";
-import { User } from "../util/interface";
 
 const prisma = new PrismaClient();
 
@@ -33,9 +32,7 @@ export const updateUserPasswordService = async (email: string, newPassword: stri
 
 export const deleteUserService = async (userId: number) => {
   await getUserService(userId);
-  await prisma.addressCredential.deleteMany({ where: { user_id: userId } });
   await prisma.passwordCredential.deleteMany({ where: { user_id: userId } });
-  await prisma.paymentCredential.deleteMany({ where: { user_id: userId } });
   await prisma.user.delete({ where: { id: userId } });
 
   return;

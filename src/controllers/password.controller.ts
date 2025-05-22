@@ -13,16 +13,16 @@ import {
   getAllPasswordCredentialsService,
   getSinglePasswordCredentialService,
   updatePasswordCredentialService,
-} from "../services/passwordCredential.service";
+} from "../services/password.service";
 import { getUserService } from "../services/user.service";
 
 /**
  * @controller createPasswordCredential
  *
  * @description
- * Handles the creation of a new password credential for the authenticated user.
+ * Handles the creation of a new password for the authenticated user.
  *
- * @param {Request} req - Express request object. Expects an object as PasswordCredential in req.body and userId in req.user
+ * @param {Request} req - Express request object. Expects an object as Password in req.body and userId in req.user
  * @param {Response} res - Express response object. Responds with the created object or an error
  *
  * @returns {void}
@@ -33,25 +33,25 @@ import { getUserService } from "../services/user.service";
 export const createPasswordCredential = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: number | undefined = req.user?.userId;
-    const { service, email, username, password, notes }: PasswordCredential = req.body;
-    if (!service || !email || !password) throw new Error("missing credentials");
+    const { service, service_user_id, password, notes }: PasswordCredential = req.body;
+    if (!service || !service_user_id || !password) throw new Error("missing credentials");
 
     const { secret_key: secret } = await getUserService(Number(userId));
-    const { email: encryptedEmail, password: encryptedPassword } = encryptPasswordCredential(
-      { service, email, username, password, notes, user: userId },
+    const { service_user_id: encryptedServiceId, password: encryptedPassword } = encryptPasswordCredential(
+      { service, service_user_id, password, notes, user: userId },
       secret
     );
 
     const newPasswordCredential = await createPasswordCredentialService({
       service,
-      email: encryptedEmail,
+      service_user_id: encryptedServiceId,
       password: encryptedPassword,
       user: userId,
-      username,
       notes,
     });
+
     res.status(201).json(newPasswordCredential);
-    logger.info(`user: ${userId} created password credential: ${newPasswordCredential.id}`);
+    logger.info(`user: ${req.user?.email} created a new credential: ${newPasswordCredential.id}`);
   } catch (err: unknown) {
     if (err instanceof Error) {
       logger.error(err.message);
@@ -148,10 +148,10 @@ export const updatePasswordCredential = async (req: Request, res: Response): Pro
   try {
     const userId: number | undefined = req.user?.userId;
     const { id } = req.params;
-    const { service, email, username, password, notes } = req.body;
-    if (!service && !email && !username && !password && !notes) throw new Error("missing credentials");
+    const { service, service_user_id, password, notes } = req.body;
+    if (!service && !service_user_id && !password && !notes) throw new Error("missing credentials");
 
-    const newCredentialData = { service, email, username, password, notes };
+    const newCredentialData = { service, service_user_id, password, notes };
 
     const { secret_key: secret } = await getUserService(Number(userId));
     const existingCredential = await getSinglePasswordCredentialService(Number(userId), Number(id));
