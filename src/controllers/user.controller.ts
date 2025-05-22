@@ -10,7 +10,21 @@ import {
 import { User } from "../util/interface";
 import bcrypt from "bcryptjs";
 
-export const getUser = async (req: Request, res: Response) => {
+/**
+ * @controller getUser
+ *
+ * @description
+ * Handles the retrieval of User.
+ *
+ * @param {Request} req - Express request object. Expects userId in req.user Obj
+ * @param {Response} res - Express response object. Responds with User obj
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the User retrieval event with the user's email address on success. Logs the error message on failure.
+ */
+export const getUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: number | undefined = req.user?.userId;
     const userCredentials = await getUserService(Number(userId));
@@ -24,6 +38,20 @@ export const getUser = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @controller updateUser
+ *
+ * @description
+ * Handles the updating of User details.
+ *
+ * @param {Request} req - Express request object. Expects userId in req.user Obj and an obj as User in req.body
+ * @param {Response} res - Express response object. Responds with updated User obj
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the User updating event with the user's email address on success. Logs the error message on failure.
+ */
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const userId: number | undefined = req.user?.userId;
@@ -39,8 +67,8 @@ export const updateUser = async (req: Request, res: Response) => {
       newData.password = hashedPassword;
     }
 
-    await updateUserService(Number(userId), newData);
-    res.status(200).json({ message: "user updated" });
+    const updatedUser = await updateUserService(Number(userId), newData);
+    res.status(200).json(updatedUser);
     logger.info(`user: ${req.user?.email} updated their user credentials`);
   } catch (err) {
     if (err instanceof Error) {
@@ -50,6 +78,20 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @controller deleteUser
+ *
+ * @description
+ * Handles deleting User account.
+ *
+ * @param {Request} req - Express request object. Expects userId in req.user Obj
+ * @param {Response} res - Express response object. Responds with message
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the deletion event with the user's email address on success. Logs the error message on failure.
+ */
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const userId: number | undefined = req.user?.userId;
@@ -64,6 +106,20 @@ export const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @controller resetUserPassword
+ *
+ * @description
+ * Handles updating User account password on account recovery.
+ *
+ * @param {Request} req - Express request object. Expects {otp, email, password} in req.body
+ * @param {Response} res - Express response object. Responds with message
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the password reset event with the user's email address on success. Logs the error message on failure.
+ */
 export const resetUserPassword = async (req: Request, res: Response) => {
   try {
     const { otp, email, password } = req.body;

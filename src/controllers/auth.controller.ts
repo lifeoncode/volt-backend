@@ -38,10 +38,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     const secret = generateSecretKey();
     const hashedPassword = bcrypt.hashSync(password, 10);
-    const user = await registerService(username, email, hashedPassword, secret);
+    await registerService(username, email, hashedPassword, secret);
 
-    res.status(201).json(user);
-    logger.info(`new user registered: ${user.email}`);
+    res.status(201).json({ username, email });
+    logger.info(`new user registered: ${email}`);
   } catch (error: unknown) {
     if (error instanceof Error) {
       logger.error(error.message);
@@ -51,7 +51,21 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const login = async (req: Request, res: Response) => {
+/**
+ * @controller login
+ *
+ * @description
+ * Handles user login.
+ *
+ * @param {Request} req - Express request object. Expects an object as User in req.body
+ * @param {Response} res - Express response object. Responds with the User object with access token or an error
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs login event with the user's email address on success. Logs the error message on failure.
+ */
+export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
     if (!email || !password) throw new Error("missing credentials");
@@ -79,7 +93,21 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-export const logout = async (req: Request, res: Response) => {
+/**
+ * @controller logout
+ *
+ * @description
+ * Handles user logout.
+ *
+ * @param {Request} req - Express request object.
+ * @param {Response} res - Express response object. Clears the refresh token stored in a browser cookie or responds with an error
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the logout event with the user's email address on success. Logs the error message on failure.
+ */
+export const logout = async (req: Request, res: Response): Promise<void> => {
   try {
     res.clearCookie("refreshToken", {
       httpOnly: true,
@@ -99,7 +127,21 @@ export const logout = async (req: Request, res: Response) => {
   }
 };
 
-export const refreshToken = async (req: Request, res: Response) => {
+/**
+ * @controller refreshToken
+ *
+ * @description
+ * Handles the refreshing of the user's jwt access token.
+ *
+ * @param {Request} req - Express request object. Expects a a refresh token in req.cookies and an object as User in req.user
+ * @param {Response} res - Express response object. Responds with the User object with access token or an error
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the token refresh event on success. Logs the error message on failure.
+ */
+export const refreshToken = async (req: Request, res: Response): Promise<void> => {
   try {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) throw new Error("No refresh token found in cookies");
@@ -122,7 +164,21 @@ export const refreshToken = async (req: Request, res: Response) => {
   }
 };
 
-export const recover = async (req: Request, res: Response) => {
+/**
+ * @controller recover
+ *
+ * @description
+ * Handles user account recovery.
+ *
+ * @param {Request} req - Express request object. Expects an email in req.body
+ * @param {Response} res - Express response object. Responds with recovery email status - sent | failed to send
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the account recovery event with the user's email address on success. Logs the error message on failure.
+ */
+export const recover = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email } = req.body;
     if (!email) throw new Error("email required");
@@ -135,6 +191,7 @@ export const recover = async (req: Request, res: Response) => {
     if (!emailSent) throw new Error("Could not send email");
 
     res.status(200).json({ message: `recovery email sent` });
+    logger.info(`${email} - attempting to recover their account`);
   } catch (error: unknown) {
     if (error instanceof Error) {
       logger.error(error.message);
@@ -144,7 +201,21 @@ export const recover = async (req: Request, res: Response) => {
   }
 };
 
-export const validateRecovery = async (req: Request, res: Response) => {
+/**
+ * @controller validateRecovery
+ *
+ * @description
+ * Handles the validation of OTP to recover the user's account.
+ *
+ * @param {Request} req - Express request object. Expects {email, otp} in req.body
+ * @param {Response} res - Express response object. Responds with validation success or failure
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the creation of a new user account with the user's email address on success. Logs the error message on failure.
+ */
+export const validateRecovery = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, otp } = req.body;
     if (!email || !otp) throw new Error("missing credentials");
