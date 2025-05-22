@@ -27,7 +27,7 @@ export const generateSecretKey = (): string => {
  *
  * @returns {String}
  */
-const encryptData = (data: string | undefined | null, secretKey: string): string => {
+export const encryptData = (data: string | undefined | null, secretKey: string): string => {
   if (!data) throw new Error("No data provided for encryption");
   return CryptoJS.AES.encrypt(data, secretKey).toString();
 };
@@ -43,7 +43,7 @@ const encryptData = (data: string | undefined | null, secretKey: string): string
  *
  * @returns {String}
  */
-const decryptData = (data: string | undefined | null, secretKey: string): string => {
+export const decryptData = (data: string | undefined | null, secretKey: string): string => {
   if (!data) throw new Error("No data provided for decryption");
   const bytes = CryptoJS.AES.decrypt(data, secretKey);
   return bytes.toString(CryptoJS.enc.Utf8);
@@ -96,7 +96,8 @@ export const decryptPasswordCredential = (data: PasswordCredential, secret: stri
  * @returns {number}
  */
 export const resolveErrorType = (errorMessage: string): number => {
-  if (errorMessage.includes("missing") || errorMessage.includes("invalid")) {
+  const message: string = errorMessage.toLowerCase();
+  if (message.includes("missing") || message.includes("invalid")) {
     return 400;
   }
   return 500;
@@ -120,34 +121,17 @@ export const updateExistingCredential = (
 ): Record<string, unknown> => {
   const credentials: string[] = [];
   const result: Record<string, unknown> = {};
-  const valuesToHide: string[] = [
-    "city",
-    "street",
-    "zip_code",
-    "password",
-    "email",
-    "security_code",
-    "card_number",
-    "card_exppiry",
-  ];
 
   for (let [key, value] of Object.entries(newCredential)) {
     if (value) {
-      if (valuesToHide.includes(key)) {
-        credentials.push(`${key}:${encryptData(value, secretKey)}`);
-      } else {
-        credentials.push(`${key}:${value}`);
-      }
+      credentials.push(`${key}:${encryptData(value, secretKey)}`);
     }
   }
 
   credentials.forEach((credential) => {
     const key = credential.split(":")[0];
     const value = credential.split(":")[1];
-
-    if (key in oldCredential) {
-      result[key] = value;
-    }
+    result[key] = value;
   });
 
   return result;

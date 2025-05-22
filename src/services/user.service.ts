@@ -47,7 +47,7 @@ export const updateUserService = async (userId: number, userData: any): Promise<
  * @service updateUserPasswordService
  *
  * @description
- * Persists updates User password.
+ * Persists updated User password.
  *
  * @param {String} email - User id
  * @param {String} newPassword - User attribute {password}
