@@ -9,7 +9,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
   id                 Int                  @id @default(autoincrement())
   username           String               @unique
@@ -20,47 +19,16 @@ model User {
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
   PasswordCredential PasswordCredential[]
-  PaymentCredential  PaymentCredential[]
-  AddressCredential  AddressCredential[]
 }
 
 model PasswordCredential {
-  id        Int      @id @default(autoincrement())
-  user_id   Int
-  user      User     @relation(fields: [user_id], references: [id])
-  service   String
-  email     String
-  username  String?
-  notes     String?
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model PaymentCredential {
-  id            Int      @id @default(autoincrement())
-  user_id       Int
-  user          User     @relation(fields: [user_id], references: [id])
-  card_holder   String
-  card_number   String   @unique
-  card_expiry   String
-  security_code String   @unique
-  card_type     String
-  notes         String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-}
-
-model AddressCredential {
-  id        Int      @id @default(autoincrement())
-  user_id   Int
-  user      User     @relation(fields: [user_id], references: [id])
-  label     String   @unique
-  city      String
-  town      String?
-  street    String   @unique
-  state     String
-  zip_code  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                  Int      @id @default(autoincrement())
+  user_id             Int
+  user                User     @relation(fields: [user_id], references: [id])
+  service             String
+  service_user_id     String
+  password            String
+  notes               String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }

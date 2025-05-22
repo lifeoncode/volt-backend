@@ -5,9 +5,7 @@ dotenv.config();
 import cookieParser from "cookie-parser";
 import { routeError } from "./middleware/routeError";
 import authRoutes from "./routes/auth.route";
-import addressCredentialRoutes from "./routes/addressCredential.route";
-import passwordCredentialRoutes from "./routes/passwordCredential.route";
-import paymentCredentialRoutes from "./routes/paymentCredential.route";
+import passwordRoutes from "./routes/password.route";
 import userRoutes from "./routes/user.route";
 
 const app = express();
@@ -22,9 +20,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/volt/api/auth", authRoutes);
-app.use("/volt/api/address", addressCredentialRoutes);
-app.use("/volt/api/password", passwordCredentialRoutes);
-app.use("/volt/api/payment", paymentCredentialRoutes);
+app.use("/volt/api/password", passwordRoutes);
 app.use("/volt/api/user", userRoutes);
 
 app.use(routeError);

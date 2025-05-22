@@ -5,7 +5,7 @@ import {
   getAllPasswordCredentials,
   getSinglePasswordCredential,
   updatePasswordCredential,
-} from "../controllers/passwordCredential.controller";
+} from "../controllers/password.controller";
 import { authenticate } from "../middleware/auth.middleware";
 
 const router = Router();

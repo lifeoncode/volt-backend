@@ -1,4 +1,4 @@
-import { AddressCredential, PasswordCredential, PaymentCredential } from "./interface";
+import { PasswordCredential } from "./interface";
 import CryptoJS from "crypto-js";
 import nodemailer from "nodemailer";
 import logger from "../middleware/logger";
@@ -19,48 +19,16 @@ const decryptData = (data: string | undefined | null, secretKey: string) => {
   return bytes.toString(CryptoJS.enc.Utf8);
 };
 
-export const encryptAddressCredential = (data: AddressCredential, secret: string) => {
-  data.city = encryptData(data.city, secret);
-  data.street = encryptData(data.street, secret);
-  data.zip_code = encryptData(data.zip_code, secret);
-
-  return data;
-};
-
 export const encryptPasswordCredential = (data: PasswordCredential, secret: string) => {
   data.password = encryptData(data.password, secret);
-  data.email = encryptData(data.email, secret);
-
-  return data;
-};
-
-export const encryptPaymentCredential = (data: PaymentCredential, secret: string) => {
-  data.security_code = encryptData(data.security_code, secret);
-  data.card_number = encryptData(data.card_number, secret);
-  data.card_expiry = encryptData(data.card_expiry, secret);
-
-  return data;
-};
-
-export const decryptAddressCredential = (data: AddressCredential, secret: string) => {
-  data.city = decryptData(data.city, secret);
-  data.street = decryptData(data.street, secret);
-  data.zip_code = decryptData(data.zip_code, secret);
+  data.service_user_id = encryptData(data.service_user_id, secret);
 
   return data;
 };
 
 export const decryptPasswordCredential = (data: PasswordCredential, secret: string) => {
   data.password = decryptData(data.password, secret);
-  data.email = decryptData(data.email, secret);
-
-  return data;
-};
-
-export const decryptPaymentCredential = (data: PaymentCredential, secret: string) => {
-  data.security_code = decryptData(data.security_code, secret);
-  data.card_number = decryptData(data.card_number, secret);
-  data.card_expiry = decryptData(data.card_expiry, secret);
+  data.service_user_id = decryptData(data.service_user_id, secret);
 
   return data;
 };
@@ -73,8 +41,8 @@ export const resolveErrorType = (errorMessage: string): number => {
 };
 
 export const updateExistingCredential = (
-  newCredential: AddressCredential | PasswordCredential | PaymentCredential,
-  oldCredential: AddressCredential | PasswordCredential | PaymentCredential,
+  newCredential: PasswordCredential,
+  oldCredential: PasswordCredential,
   secretKey: string
 ) => {
   const credentials: string[] = [];
