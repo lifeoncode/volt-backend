@@ -16,7 +16,21 @@ import fs from "node:fs";
 import { JWTPayload } from "../util/interface";
 import { getUserService } from "../services/user.service";
 
-export const register = async (req: Request, res: Response) => {
+/**
+ * @controller register
+ *
+ * @description
+ * Handles the creation of a new user account.
+ *
+ * @param {Request} req - Express request object. Expects an object as User in req.body
+ * @param {Response} res - Express response object. Responds with the created object or an error
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the creation of a new user account with the user's email address on success. Logs the error message on failure.
+ */
+export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, email, password } = req.body;
     if (!username || !email || !password) throw new Error("missing credentials");
