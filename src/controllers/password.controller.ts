@@ -39,7 +39,7 @@ export const createPasswordCredential = async (req: Request, res: Response): Pro
     const { secret_key: secret } = await getUserService(Number(userId));
     const { service_user_id: encryptedServiceId, password: encryptedPassword } = encryptPasswordCredential(
       { service, service_user_id, password, notes, user: userId },
-      secret
+      secret as string
     );
 
     const newPasswordCredential = await createPasswordCredentialService({
@@ -82,7 +82,7 @@ export const getAllPasswordCredentials = async (req: Request, res: Response): Pr
 
     const { secret_key: secret } = await getUserService(Number(userId));
     for (let credential of passwordCredentials) {
-      decryptPasswordCredential(credential, secret);
+      decryptPasswordCredential(credential, secret as string);
     }
 
     res.status(200).json(passwordCredentials);
@@ -117,7 +117,7 @@ export const getSinglePasswordCredential = async (req: Request, res: Response): 
     const credential = await getSinglePasswordCredentialService(Number(userId), Number(id));
 
     const { secret_key: secret } = await getUserService(Number(userId));
-    decryptPasswordCredential(credential, secret);
+    decryptPasswordCredential(credential, secret as string);
 
     res.status(200).json(credential);
     logger.info(`user: ${userId} fetched single password credential: ${credential?.id}`);
@@ -156,8 +156,8 @@ export const updatePasswordCredential = async (req: Request, res: Response): Pro
     const { secret_key: secret } = await getUserService(Number(userId));
     const existingCredential = await getSinglePasswordCredentialService(Number(userId), Number(id));
 
-    const decryptedCredential = decryptPasswordCredential(existingCredential, secret);
-    const newCredential = updateExistingCredential(newCredentialData, decryptedCredential, secret);
+    const decryptedCredential = decryptPasswordCredential(existingCredential, secret as string);
+    const newCredential = updateExistingCredential(newCredentialData, decryptedCredential, secret as string);
 
     const updatedCredential = await updatePasswordCredentialService(Number(userId), Number(id), newCredential);
 
