@@ -1,9 +1,28 @@
 import { PrismaClient } from "../../generated/prisma";
 import bcrypt from "bcryptjs";
+import { User } from "../util/interface";
 
 const prisma = new PrismaClient();
 
-export const registerService = async (username: string, email: string, password: string, secret: string) => {
+/**
+ * @service registerService
+ *
+ * @description
+ * Persists a new User in DB.
+ *
+ * @param {String} username - User username
+ * @param {String} email - User email
+ * @param {String} password - User password
+ * @param {String} secret - Secret generated once and used for User data encryption
+ *
+ * @returns {User}
+ */
+export const registerService = async (
+  username: string,
+  email: string,
+  password: string,
+  secret: string
+): Promise<User> => {
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) throw new Error("user already exists");
 
@@ -16,10 +35,21 @@ export const registerService = async (username: string, email: string, password:
     data: { username, email, password, secret_key: secret },
   });
 
-  return { id: newUser.id, username: newUser.username, email: newUser.email };
+  return newUser;
 };
 
-export const loginService = async (email: string, password: string) => {
+/**
+ * @service loginService
+ *
+ * @description
+ * Handles User login.
+ *
+ * @param {String} email - User username
+ * @param {String} password - User password
+ *
+ * @returns {User}
+ */
+export const loginService = async (email: string, password: string): Promise<Record<string, unknown>> => {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) throw new Error("user not found");
   const passwordMatch = bcrypt.compareSync(password, user.password);
@@ -35,14 +65,36 @@ export const recoverService = async (email: string) => {
   return email;
 };
 
-export const storeRecoveryOTPService = async (email: string, otp: string) => {
+/**
+ * @service storeRecoveryOTPService
+ *
+ * @description
+ * Persists OTP in DB.
+ *
+ * @param {String} email - User email
+ * @param {String} otp - Generated 4-digit pin
+ *
+ * @returns {String}
+ */
+export const storeRecoveryOTPService = async (email: string, otp: string): Promise<string | undefined> => {
   await recoverService(email);
   const { recovery_otp } = await prisma.user.update({ where: { email }, data: { recovery_otp: otp } });
 
-  return recovery_otp;
+  return recovery_otp?.toString();
 };
 
-export const verifyOTPService = async (email: string, otp: string) => {
+/**
+ * @service verifyOTPService
+ *
+ * @description
+ * Verifies the OTP.
+ *
+ * @param {String} email - User email
+ * @param {String} otp - Generated 4-digit pin
+ *
+ * @returns {String}
+ */
+export const verifyOTPService = async (email: string, otp: string): Promise<string> => {
   await recoverService(email);
 
   const otpMatch = await prisma.user.findFirst({ where: { recovery_otp: otp } });

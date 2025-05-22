@@ -3,7 +3,17 @@ import { PasswordCredential } from "../util/interface";
 
 const prisma = new PrismaClient();
 
-export const createPasswordCredentialService = async (data: PasswordCredential) => {
+/**
+ * @service createPasswordCredentialService
+ *
+ * @description
+ * Persists a new PasswordCredential in DB.
+ *
+ * @param {PasswordCredential} data - PasswordCredential obj
+ *
+ * @returns {PasswordCredential}
+ */
+export const createPasswordCredentialService = async (data: PasswordCredential): Promise<PasswordCredential> => {
   const existingPasswordCredential = await prisma.passwordCredential.findFirst({
     where: { service: data.service, service_user_id: data.service_user_id },
   });
@@ -19,18 +29,38 @@ export const createPasswordCredentialService = async (data: PasswordCredential) 
     },
   });
 
-  return {
-    id: newPasswordCredential.id,
-    service: newPasswordCredential.service,
-    service_user_id: newPasswordCredential.service_user_id,
-  };
+  return newPasswordCredential;
 };
 
-export const getAllPasswordCredentialsService = async (userId: number | undefined) => {
+/**
+ * @service getAllPasswordCredentialsService
+ *
+ * @description
+ * Queries DB for all PasswordCredential objs for a User.
+ *
+ * @param {number} userId - User id
+ *
+ * @returns {PasswordCredential[]}
+ */
+export const getAllPasswordCredentialsService = async (userId: number | undefined): Promise<PasswordCredential[]> => {
   return prisma.passwordCredential.findMany({ where: { user_id: userId } });
 };
 
-export const getSinglePasswordCredentialService = async (userId: number | undefined, credentialId: number) => {
+/**
+ * @service getSinglePasswordCredentialService
+ *
+ * @description
+ * Queries DB for a specific PasswordCredential obj for a User.
+ *
+ * @param {number} userId - User id
+ * @param {number} credentialId - PasswordCredential id
+ *
+ * @returns {PasswordCredential}
+ */
+export const getSinglePasswordCredentialService = async (
+  userId: number | undefined,
+  credentialId: number
+): Promise<PasswordCredential> => {
   const credentials = await prisma.passwordCredential.findMany({
     where: { user_id: userId },
   });
@@ -42,11 +72,23 @@ export const getSinglePasswordCredentialService = async (userId: number | undefi
   return matchedCredential;
 };
 
+/**
+ * @service updatePasswordCredentialService
+ *
+ * @description
+ * Persists a specific updated PasswordCredential.
+ *
+ * @param {number} userId - User id
+ * @param {number} credentialId - PasswordCredential id
+ * @param {Record<string, unknown>} newCredentialData - PasswordCredential attributes
+ *
+ * @returns {PasswordCredential}
+ */
 export const updatePasswordCredentialService = async (
   userId: number | undefined,
   credentialId: number,
   newCredentialData: any
-) => {
+): Promise<PasswordCredential> => {
   const matchedCredential = await prisma.passwordCredential.findFirst({
     where: { user_id: userId, id: credentialId },
   });
@@ -58,7 +100,21 @@ export const updatePasswordCredentialService = async (
   });
 };
 
-export const deletePasswordCredentialService = async (userId: number | undefined, credentialId: number) => {
+/**
+ * @service deletePasswordCredentialService
+ *
+ * @description
+ * Removes a specific PasswordCredential from DB.
+ *
+ * @param {number} userId - User id
+ * @param {number} credentialId - PasswordCredential id
+ *
+ * @returns {PasswordCredential}
+ */
+export const deletePasswordCredentialService = async (
+  userId: number | undefined,
+  credentialId: number
+): Promise<PasswordCredential> => {
   const matchedCredential = await prisma.passwordCredential.findFirst({
     where: { user_id: userId, id: credentialId },
   });
