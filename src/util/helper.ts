@@ -4,35 +4,97 @@ import nodemailer from "nodemailer";
 import logger from "../middleware/logger";
 import { storeRecoveryOTPService } from "../services/auth.service";
 
-export const generateSecretKey = () => {
+/**
+ * @func generateSecretKey
+ *
+ * @description
+ * Generates an encrypted hash.
+ *
+ * @returns {String}
+ */
+export const generateSecretKey = (): string => {
   return CryptoJS.lib.WordArray.random(32).toString(CryptoJS.enc.Hex);
 };
 
-const encryptData = (data: string | undefined | null, secretKey: string) => {
+/**
+ * @func encryptData
+ *
+ * @description
+ * Encrypts data.
+ *
+ * @param {String} data - Data to encrypt
+ * @param {String} secretKey - Secret to perform encryption
+ *
+ * @returns {String}
+ */
+const encryptData = (data: string | undefined | null, secretKey: string): string => {
   if (!data) throw new Error("No data provided for encryption");
   return CryptoJS.AES.encrypt(data, secretKey).toString();
 };
 
-const decryptData = (data: string | undefined | null, secretKey: string) => {
+/**
+ * @func decryptData
+ *
+ * @description
+ * Decrypts data.
+ *
+ * @param {String} data - Data to decrypt
+ * @param {String} secretKey - Secret to perform decryption
+ *
+ * @returns {String}
+ */
+const decryptData = (data: string | undefined | null, secretKey: string): string => {
   if (!data) throw new Error("No data provided for decryption");
   const bytes = CryptoJS.AES.decrypt(data, secretKey);
   return bytes.toString(CryptoJS.enc.Utf8);
 };
 
-export const encryptPasswordCredential = (data: PasswordCredential, secret: string) => {
+/**
+ * @func encryptPasswordCredential
+ *
+ * @description
+ * encrypts PasswordCredential.
+ *
+ * @param {String} data - PasswordCredential to encrypt
+ * @param {String} secret - Secret to perform encryption
+ *
+ * @returns {PasswordCredential}
+ */
+export const encryptPasswordCredential = (data: PasswordCredential, secret: string): PasswordCredential => {
   data.password = encryptData(data.password, secret);
   data.service_user_id = encryptData(data.service_user_id, secret);
 
   return data;
 };
 
-export const decryptPasswordCredential = (data: PasswordCredential, secret: string) => {
+/**
+ * @func decryptPasswordCredential
+ *
+ * @description
+ * decrypts PasswordCredential.
+ *
+ * @param {String} data - PasswordCredential to decrypt
+ * @param {String} secret - Secret to perform decryption
+ *
+ * @returns {PasswordCredential}
+ */
+export const decryptPasswordCredential = (data: PasswordCredential, secret: string): PasswordCredential => {
   data.password = decryptData(data.password, secret);
   data.service_user_id = decryptData(data.service_user_id, secret);
 
   return data;
 };
 
+/**
+ * @func resolveErrorType
+ *
+ * @description
+ * Resolves request errors.
+ *
+ * @param {String} errorMessage - Error message to determine error type
+ *
+ * @returns {number}
+ */
 export const resolveErrorType = (errorMessage: string): number => {
   if (errorMessage.includes("missing") || errorMessage.includes("invalid")) {
     return 400;
@@ -40,13 +102,24 @@ export const resolveErrorType = (errorMessage: string): number => {
   return 500;
 };
 
+/**
+ * @func updateExistingCredential
+ *
+ * @description
+ * Resolves PasswordCredential attributes updating.
+ *
+ * @param {PasswordCredential} newCredential - New PasswordCredential attributes
+ * @param {PasswordCredential} newCredential - Existing PasswordCredential attributes
+ *
+ * @returns {Record<string, unknown>}
+ */
 export const updateExistingCredential = (
   newCredential: PasswordCredential,
   oldCredential: PasswordCredential,
   secretKey: string
-) => {
+): Record<string, unknown> => {
   const credentials: string[] = [];
-  const result: Record<string, any> = {};
+  const result: Record<string, unknown> = {};
   const valuesToHide: string[] = [
     "city",
     "street",
@@ -80,6 +153,14 @@ export const updateExistingCredential = (
   return result;
 };
 
+/**
+ * @func generateOTP
+ *
+ * @description
+ * Generates a  4-digit pin.
+ *
+ * @returns {String}
+ */
 export const generateOTP = (): string => {
   let otp = "";
   for (let i = 0; i < 4; i++) {
@@ -89,6 +170,20 @@ export const generateOTP = (): string => {
   return otp;
 };
 
+/**
+ * @func sendEmail
+ *
+ * @description
+ * Sends email to User email address for account recovery.
+ *
+ * @param {String} email - User email
+ * @param {String} otp - Generated 4-digit pin
+ *
+ * @returns {boolean}
+ *
+ * @sideEffects
+ * Logs email event on success. Logs error message on failure
+ */
 export const sendEmail = async (email: string, otp: string): Promise<boolean> => {
   const transporter = nodemailer.createTransport({
     host: "mail.yellogarden.co.za",
