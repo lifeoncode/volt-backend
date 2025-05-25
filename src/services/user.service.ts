@@ -13,7 +13,7 @@ const prisma = new PrismaClient();
  *
  * @returns {User}
  */
-export const getUserService = async (userId: number): Promise<User> => {
+export const getUserService = async (userId: string): Promise<User> => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });
@@ -33,7 +33,7 @@ export const getUserService = async (userId: number): Promise<User> => {
  *
  * @returns {User}
  */
-export const updateUserService = async (userId: number, userData: any): Promise<User> => {
+export const updateUserService = async (userId: string, userData: any): Promise<User> => {
   await getUserService(userId);
   const user = await prisma.user.update({
     where: { id: userId },
@@ -74,7 +74,7 @@ export const updateUserPasswordService = async (email: string, newPassword: stri
  *
  * @returns {User}
  */
-export const deleteUserService = async (userId: number): Promise<User> => {
+export const deleteUserService = async (userId: string): Promise<User> => {
   await getUserService(userId);
   await prisma.passwordCredential.deleteMany({ where: { user_id: userId } });
 

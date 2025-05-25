@@ -26,8 +26,10 @@ import bcrypt from "bcryptjs";
  */
 export const getUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId: number | undefined = req.user?.userId;
-    const userCredentials = await getUserService(Number(userId));
+    const userId: string | undefined = req.user?.userId;
+    if (!userId) throw new Error("user session not found");
+
+    const userCredentials = await getUserService(userId);
     res.status(200).json({ username: userCredentials.username, email: userCredentials.email });
     logger.info(`user: ${userCredentials.email} fetched their user credentials`);
   } catch (err) {
@@ -52,9 +54,11 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
  * @sideEffects
  * Logs the User updating event with the user's email address on success. Logs the error message on failure.
  */
-export const updateUser = async (req: Request, res: Response) => {
+export const updateUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId: number | undefined = req.user?.userId;
+    const userId: string | undefined = req.user?.userId;
+    if (!userId) throw new Error("user session not found");
+
     const { username, email, password }: User = req.body;
     if (!username && !email && !password) throw new Error("missing credentials");
 
@@ -67,7 +71,7 @@ export const updateUser = async (req: Request, res: Response) => {
       newData.password = hashedPassword;
     }
 
-    const updatedUser = await updateUserService(Number(userId), newData);
+    const updatedUser = await updateUserService(userId, newData);
     res.status(200).json(updatedUser);
     logger.info(`user: ${req.user?.email} updated their user credentials`);
   } catch (err) {
@@ -92,10 +96,11 @@ export const updateUser = async (req: Request, res: Response) => {
  * @sideEffects
  * Logs the deletion event with the user's email address on success. Logs the error message on failure.
  */
-export const deleteUser = async (req: Request, res: Response) => {
+export const deleteUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId: number | undefined = req.user?.userId;
-    await deleteUserService(Number(userId));
+    const userId: string | undefined = req.user?.userId;
+    if (!userId) throw new Error("user session not found");
+    await deleteUserService(userId);
     logger.info(`user: ${req.user?.email} deleted their account`);
     res.status(200).json({ message: "user deleted" });
   } catch (err) {

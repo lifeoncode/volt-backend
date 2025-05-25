@@ -32,17 +32,19 @@ import { getUserService } from "../services/user.service";
  */
 export const createPasswordCredential = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId: number | undefined = req.user?.userId;
+    const userId: string | undefined = req.user?.userId;
+    if (!userId) throw new Error("user session not found");
+
     const { service, service_user_id, password, notes }: PasswordCredential = req.body;
     if (!service || !service_user_id || !password) throw new Error("missing credentials");
 
-    const { secret_key: secret } = await getUserService(Number(userId));
+    const { secret_key: secret } = await getUserService(userId);
     const { service_user_id: encryptedServiceId, password: encryptedPassword } = encryptPasswordCredential(
       { service, service_user_id, password, notes, user: userId },
       secret as string
     );
 
-    const newPasswordCredential = await createPasswordCredentialService({
+    const newPasswordCredential = await createPasswordCredentialService(userId, {
       service,
       service_user_id: encryptedServiceId,
       password: encryptedPassword,
@@ -77,10 +79,12 @@ export const createPasswordCredential = async (req: Request, res: Response): Pro
  */
 export const getAllPasswordCredentials = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId: number | undefined = req.user?.userId;
+    const userId: string | undefined = req.user?.userId;
+    if (!userId) throw new Error("user session not found");
+
     const passwordCredentials = await getAllPasswordCredentialsService(userId);
 
-    const { secret_key: secret } = await getUserService(Number(userId));
+    const { secret_key: secret } = await getUserService(userId);
     for (let credential of passwordCredentials) {
       decryptPasswordCredential(credential, secret as string);
     }
@@ -112,11 +116,13 @@ export const getAllPasswordCredentials = async (req: Request, res: Response): Pr
  */
 export const getSinglePasswordCredential = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId: number | undefined = req.user?.userId;
-    const { id } = req.params;
-    const credential = await getSinglePasswordCredentialService(Number(userId), Number(id));
+    const userId: string | undefined = req.user?.userId;
+    if (!userId) throw new Error("user session not found");
 
-    const { secret_key: secret } = await getUserService(Number(userId));
+    const { id } = req.params;
+    const credential = await getSinglePasswordCredentialService(userId, id);
+
+    const { secret_key: secret } = await getUserService(userId);
     decryptPasswordCredential(credential, secret as string);
 
     res.status(200).json(credential);
@@ -146,20 +152,22 @@ export const getSinglePasswordCredential = async (req: Request, res: Response): 
  */
 export const updatePasswordCredential = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId: number | undefined = req.user?.userId;
+    const userId: string | undefined = req.user?.userId;
+    if (!userId) throw new Error("user session not found");
+
     const { id } = req.params;
     const { service, service_user_id, password, notes } = req.body;
     if (!service && !service_user_id && !password && !notes) throw new Error("missing credentials");
 
     const newCredentialData = { service, service_user_id, password, notes };
 
-    const { secret_key: secret } = await getUserService(Number(userId));
-    const existingCredential = await getSinglePasswordCredentialService(Number(userId), Number(id));
+    const { secret_key: secret } = await getUserService(userId);
+    const existingCredential = await getSinglePasswordCredentialService(userId, id);
 
     const decryptedCredential = decryptPasswordCredential(existingCredential, secret as string);
     const newCredential = updateExistingCredential(newCredentialData, decryptedCredential, secret as string);
 
-    const updatedCredential = await updatePasswordCredentialService(Number(userId), Number(id), newCredential);
+    const updatedCredential = await updatePasswordCredentialService(userId, id, newCredential);
 
     res.status(200).json(updatedCredential);
     logger.info(`user: ${userId} updated password credential: ${updatedCredential?.id}`);
@@ -188,9 +196,11 @@ export const updatePasswordCredential = async (req: Request, res: Response): Pro
  */
 export const deletePasswordCredential = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId: number | undefined = req.user?.userId;
+    const userId: string | undefined = req.user?.userId;
+    if (!userId) throw new Error("user session not found");
+
     const { id } = req.params;
-    const deletedCredential = await deletePasswordCredentialService(Number(userId), Number(id));
+    const deletedCredential = await deletePasswordCredentialService(userId, id);
 
     res.status(200).json(deletedCredential);
     logger.info(`user: ${userId} deleted password credential: ${deletedCredential}`);

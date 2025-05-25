@@ -1,5 +1,5 @@
 export interface User {
-  id?: number;
+  id?: string;
   username: string;
   email: string;
   password: string;
@@ -9,14 +9,14 @@ export interface User {
 }
 
 export interface JWTPayload {
-  userId: number;
+  userId: string;
   email: string;
 }
 
 export interface PasswordCredential {
-  id?: number;
+  id?: string;
   user?: any;
-  user_id?: number;
+  user_id?: string;
   service: string;
   service_user_id: string;
   password: string;
