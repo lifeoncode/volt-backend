@@ -10,10 +10,10 @@ const prisma = new PrismaClient();
  * @description
  * Persists a new User in DB.
  *
- * @param {String} username - User username
- * @param {String} email - User email
- * @param {String} password - User password
- * @param {String} secret - Secret generated once and used for User data encryption
+ * @param {string} username - User username
+ * @param {string} email - User email
+ * @param {string} password - User password
+ * @param {string} secret - Secret generated once and used for User data encryption
  *
  * @returns {User}
  */
@@ -44,8 +44,8 @@ export const registerService = async (
  * @description
  * Handles User login.
  *
- * @param {String} email - User username
- * @param {String} password - User password
+ * @param {string} email - User username
+ * @param {string} password - User password
  *
  * @returns {User}
  */
@@ -71,10 +71,10 @@ export const recoverService = async (email: string) => {
  * @description
  * Persists OTP in DB.
  *
- * @param {String} email - User email
- * @param {String} otp - Generated 4-digit pin
+ * @param {string} email - User email
+ * @param {string} otp - Generated 4-digit pin
  *
- * @returns {String}
+ * @returns {string}
  */
 export const storeRecoveryOTPService = async (email: string, otp: string): Promise<string | undefined> => {
   await recoverService(email);
@@ -89,10 +89,10 @@ export const storeRecoveryOTPService = async (email: string, otp: string): Promi
  * @description
  * Verifies the OTP.
  *
- * @param {String} email - User email
- * @param {String} otp - Generated 4-digit pin
+ * @param {string} email - User email
+ * @param {string} otp - Generated 4-digit pin
  *
- * @returns {String}
+ * @returns {string}
  */
 export const verifyOTPService = async (email: string, otp: string): Promise<string> => {
   await recoverService(email);

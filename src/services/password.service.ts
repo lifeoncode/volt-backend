@@ -46,7 +46,7 @@ export const createPasswordCredentialService = async (
  * @description
  * Queries DB for all PasswordCredential objs for a User.
  *
- * @param {number} userId - User id
+ * @param {string} userId - User id
  *
  * @returns {PasswordCredential[]}
  */
@@ -60,8 +60,8 @@ export const getAllPasswordCredentialsService = async (userId: string | undefine
  * @description
  * Queries DB for a specific PasswordCredential obj for a User.
  *
- * @param {number} userId - User id
- * @param {number} credentialId - PasswordCredential id
+ * @param {string} userId - User id
+ * @param {string} credentialId - PasswordCredential id
  *
  * @returns {PasswordCredential}
  */
@@ -86,8 +86,8 @@ export const getSinglePasswordCredentialService = async (
  * @description
  * Persists a specific updated PasswordCredential.
  *
- * @param {number} userId - User id
- * @param {number} credentialId - PasswordCredential id
+ * @param {string} userId - User id
+ * @param {string} credentialId - PasswordCredential id
  * @param {Record<string, unknown>} newCredentialData - PasswordCredential attributes
  *
  * @returns {PasswordCredential}
@@ -114,8 +114,8 @@ export const updatePasswordCredentialService = async (
  * @description
  * Removes a specific PasswordCredential from DB.
  *
- * @param {number} userId - User id
- * @param {number} credentialId - PasswordCredential id
+ * @param {string} userId - User id
+ * @param {string} credentialId - PasswordCredential id
  *
  * @returns {PasswordCredential}
  */
@@ -133,7 +133,17 @@ export const deletePasswordCredentialService = async (
   });
 };
 
-export const deleteAllPasswordCredentialsService = async (userId: string) => {
+/**
+ * @service deletePasswordCredentialService
+ *
+ * @description
+ * Removes a specific PasswordCredential from DB.
+ *
+ * @param {string} userId - User id
+ *
+ * @returns {Record<string, unknown>}
+ */
+export const deleteAllPasswordCredentialsService = async (userId: string): Promise<Record<string, unknown>> => {
   const credentials = await getAllPasswordCredentialsService(userId);
   if (credentials.length === 0) throw new Error("no credentials found");
 

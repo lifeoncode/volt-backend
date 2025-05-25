@@ -214,6 +214,20 @@ export const deletePasswordCredential = async (req: Request, res: Response): Pro
   }
 };
 
+/**
+ * @controller deleteAllPasswordCredentials
+ *
+ * @description
+ * Handles the deletion of all password credentials for the authenticated user.
+ *
+ * @param {Request} req - Express request object. Expects userId in req.user
+ * @param {Response} res - Express response object. Responds with a number of deleted objs or an error
+ *
+ * @returns {void}
+ *
+ * @sideEffects
+ * Logs the deletion credentials with the user email on success. Logs the error message on failure.
+ */
 export const deleteAllPasswordCredentials = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: string | undefined = req.user?.userId;
