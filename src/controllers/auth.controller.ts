@@ -151,7 +151,7 @@ export const refreshToken = async (req: Request, res: Response): Promise<void> =
       expiresIn: "15m",
     });
 
-    const user = await getUserService(Number(req.user.userId));
+    const user = await getUserService(req.user.userId);
 
     res.status(200).json({ username: user.username, email: user.email, token: accessToken });
     logger.info("new access token generated");

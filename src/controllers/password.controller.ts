@@ -9,6 +9,7 @@ import {
 } from "../util/helper";
 import {
   createPasswordCredentialService,
+  deleteAllPasswordCredentialsService,
   deletePasswordCredentialService,
   getAllPasswordCredentialsService,
   getSinglePasswordCredentialService,
@@ -205,6 +206,23 @@ export const deletePasswordCredential = async (req: Request, res: Response): Pro
     res.status(200).json(deletedCredential);
     logger.info(`user: ${userId} deleted password credential: ${deletedCredential}`);
   } catch (err: unknown) {
+    if (err instanceof Error) {
+      logger.error(err.message);
+      const errorType: number = resolveErrorType(err.message);
+      res.status(errorType).json({ message: err.message });
+    }
+  }
+};
+
+export const deleteAllPasswordCredentials = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId: string | undefined = req.user?.userId;
+    if (!userId) throw new Error("user session not found");
+
+    const data = await deleteAllPasswordCredentialsService(userId);
+    res.status(200).json(data);
+    logger.info(`user: ${req.user?.email} deleted all their passwords`);
+  } catch (err) {
     if (err instanceof Error) {
       logger.error(err.message);
       const errorType: number = resolveErrorType(err.message);

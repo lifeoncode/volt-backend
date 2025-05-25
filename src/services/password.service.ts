@@ -132,3 +132,10 @@ export const deletePasswordCredentialService = async (
     where: { user_id: userId, id: credentialId },
   });
 };
+
+export const deleteAllPasswordCredentialsService = async (userId: string) => {
+  const credentials = await getAllPasswordCredentialsService(userId);
+  if (credentials.length === 0) throw new Error("no credentials found");
+
+  return await prisma.passwordCredential.deleteMany({ where: { user_id: userId } });
+};

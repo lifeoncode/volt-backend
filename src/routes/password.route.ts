@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createPasswordCredential,
+  deleteAllPasswordCredentials,
   deletePasswordCredential,
   getAllPasswordCredentials,
   getSinglePasswordCredential,
@@ -23,6 +24,7 @@ router.post("/", createPasswordCredential);
 router.get("/", getAllPasswordCredentials);
 router.get("/:id", getSinglePasswordCredential);
 router.put("/:id", updatePasswordCredential);
+router.delete("/", deleteAllPasswordCredentials);
 router.delete("/:id", deletePasswordCredential);
 
 export default router;
