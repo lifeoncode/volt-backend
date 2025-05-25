@@ -94,6 +94,7 @@ generated/prisma/
 
 # dotenv environment variable files
 .env
+.env.test
 .env.development.local
 .env.test.local
 .env.production.local

@@ -9,6 +9,7 @@ const config: Config = {
   },
   testEnvironment: "node",
   roots: ["<rootDir>/src"],
+  setupFilesAfterEnv: ["<rootDir>/src/tests/setup.ts"],
   testMatch: ["**/tests/**/*.test.ts"],
   moduleFileExtensions: ["ts", "js", "json", "node"],
 };

@@ -40,7 +40,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     const hashedPassword = bcrypt.hashSync(password, 10);
     await registerService(username, email, hashedPassword, secret);
 
-    res.status(201).json({ username, email });
+    res.status(201).json({ user: { username, email } });
     logger.info(`new user registered: ${email}`);
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -82,13 +82,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(200).json({ username: user.username, email: user.email, token: accessToken });
+    res.status(200).json({ user: { username: user.username, email: user.email }, token: accessToken });
     logger.info(`${user.email} login success`);
   } catch (error: unknown) {
     if (error instanceof Error) {
       logger.error(error.message);
       const errorType: number = resolveErrorType(error.message);
-      res.status(errorType).json(error.message);
+      res.status(errorType).json({ message: error.message });
     }
   }
 };
@@ -151,9 +151,9 @@ export const refreshToken = async (req: Request, res: Response): Promise<void> =
       expiresIn: "15m",
     });
 
-    const user = await getUserService(req.user.userId);
+    await getUserService(req.user.userId);
 
-    res.status(200).json({ username: user.username, email: user.email, token: accessToken });
+    res.status(200).json({ token: accessToken });
     logger.info("new access token generated");
   } catch (error: unknown) {
     if (error instanceof Error) {

@@ -1,14 +1,14 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-dotenv.config();
+dotenv.config({ path: ".env" });
 import cookieParser from "cookie-parser";
 import { routeError } from "./middleware/routeError";
 import authRoutes from "./routes/auth.route";
 import passwordRoutes from "./routes/password.route";
 import userRoutes from "./routes/user.route";
 
-const app = express();
+export const app = express();
 app.use(
   cors({
     origin: ["http://localhost:5173", "http://localhost:4173", "https://voltsec.vercel.app"],
