@@ -37,6 +37,6 @@ describe("Auth API", () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty("token");
-    expect(res.body.user.email).toBe("test@example.com");
+    expect(res.body.email).toBe("test@example.com");
   });
 });
