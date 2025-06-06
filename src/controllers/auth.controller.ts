@@ -88,7 +88,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     if (error instanceof Error) {
       logger.error(error.message);
       const errorType: number = resolveErrorType(error.message);
-      res.status(errorType).json({ message: error.message });
+      res.status(errorType).json(error.message);
     }
   }
 };

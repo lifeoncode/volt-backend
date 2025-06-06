@@ -59,7 +59,7 @@ export const createPasswordCredential = async (req: Request, res: Response): Pro
     if (err instanceof Error) {
       logger.error(err.message);
       const errorType: number = resolveErrorType(err.message);
-      res.status(errorType).json({ message: err.message });
+      res.status(errorType).json(err.message);
     }
   }
 };
@@ -96,7 +96,7 @@ export const getAllPasswordCredentials = async (req: Request, res: Response): Pr
     if (err instanceof Error) {
       logger.error(err.message);
       const errorType: number = resolveErrorType(err.message);
-      res.status(errorType).json({ message: err.message });
+      res.status(errorType).json(err.message);
     }
   }
 };
@@ -132,7 +132,7 @@ export const getSinglePasswordCredential = async (req: Request, res: Response): 
     if (err instanceof Error) {
       logger.error(err.message);
       const errorType: number = resolveErrorType(err.message);
-      res.status(errorType).json({ message: err.message });
+      res.status(errorType).json(err.message);
     }
   }
 };
@@ -176,7 +176,7 @@ export const updatePasswordCredential = async (req: Request, res: Response): Pro
     if (err instanceof Error) {
       logger.error(err.message);
       const errorType: number = resolveErrorType(err.message);
-      res.status(errorType).json({ message: err.message });
+      res.status(errorType).json(err.message);
     }
   }
 };
@@ -209,7 +209,7 @@ export const deletePasswordCredential = async (req: Request, res: Response): Pro
     if (err instanceof Error) {
       logger.error(err.message);
       const errorType: number = resolveErrorType(err.message);
-      res.status(errorType).json({ message: err.message });
+      res.status(errorType).json(err.message);
     }
   }
 };
@@ -240,7 +240,7 @@ export const deleteAllPasswordCredentials = async (req: Request, res: Response):
     if (err instanceof Error) {
       logger.error(err.message);
       const errorType: number = resolveErrorType(err.message);
-      res.status(errorType).json({ message: err.message });
+      res.status(errorType).json(err.message);
     }
   }
 };
