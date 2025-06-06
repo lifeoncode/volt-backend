@@ -151,9 +151,9 @@ export const refreshToken = async (req: Request, res: Response): Promise<void> =
       expiresIn: "15m",
     });
 
-    await getUserService(req.user.userId);
+    const { username, email } = await getUserService(req.user.userId);
 
-    res.status(200).json({ token: accessToken });
+    res.status(200).json({ username, email, token: accessToken });
     logger.info("new access token generated");
   } catch (error: unknown) {
     if (error instanceof Error) {
