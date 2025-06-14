@@ -54,7 +54,7 @@ export const createPasswordCredential = async (req: Request, res: Response): Pro
     });
 
     res.status(201).json(newPasswordCredential);
-    logger.info(`user: ${req.user?.email} created a new credential: ${newPasswordCredential.id}`);
+    logger.info(`new credential: ${newPasswordCredential.id}`);
   } catch (err: unknown) {
     if (err instanceof Error) {
       logger.error(err.message);
@@ -91,7 +91,7 @@ export const getAllPasswordCredentials = async (req: Request, res: Response): Pr
     }
 
     res.status(200).json(passwordCredentials);
-    logger.info(`user: ${userId} fetched all password credentials`);
+    logger.info(`user: ${userId} fetched all credentials`);
   } catch (err: unknown) {
     if (err instanceof Error) {
       logger.error(err.message);
@@ -127,7 +127,7 @@ export const getSinglePasswordCredential = async (req: Request, res: Response): 
     decryptPasswordCredential(credential, secret as string);
 
     res.status(200).json(credential);
-    logger.info(`user: ${userId} fetched single password credential: ${credential?.id}`);
+    logger.info(`user: ${userId} fetched single credential`);
   } catch (err: unknown) {
     if (err instanceof Error) {
       logger.error(err.message);
@@ -171,7 +171,7 @@ export const updatePasswordCredential = async (req: Request, res: Response): Pro
     const updatedCredential = await updatePasswordCredentialService(userId, id, newCredential);
 
     res.status(200).json(updatedCredential);
-    logger.info(`user: ${userId} updated password credential: ${updatedCredential?.id}`);
+    logger.info(`user: ${userId} updated a credential`);
   } catch (err: unknown) {
     if (err instanceof Error) {
       logger.error(err.message);
@@ -204,7 +204,7 @@ export const deletePasswordCredential = async (req: Request, res: Response): Pro
     const deletedCredential = await deletePasswordCredentialService(userId, id);
 
     res.status(200).json(deletedCredential);
-    logger.info(`user: ${userId} deleted password credential: ${deletedCredential}`);
+    logger.info(`user: ${userId} deleted a credential`);
   } catch (err: unknown) {
     if (err instanceof Error) {
       logger.error(err.message);
@@ -235,7 +235,7 @@ export const deleteAllPasswordCredentials = async (req: Request, res: Response):
 
     const data = await deleteAllPasswordCredentialsService(userId);
     res.status(200).json(data);
-    logger.info(`user: ${req.user?.email} deleted all their passwords`);
+    logger.info(`user: ${userId} deleted all credentials`);
   } catch (err) {
     if (err instanceof Error) {
       logger.error(err.message);

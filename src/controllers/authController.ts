@@ -117,7 +117,7 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     });
 
     res.status(200).json("logged out");
-    logger.info(`${req.user?.email} logout success`);
+    logger.info("logout success");
   } catch (error: unknown) {
     if (error instanceof Error) {
       logger.error(error.message);
@@ -191,7 +191,7 @@ export const recover = async (req: Request, res: Response): Promise<void> => {
     if (!emailSent) throw new Error("Could not send email");
 
     res.status(200).json("recovery email sent");
-    logger.info(`${email} - attempting to recover their account`);
+    logger.info(`${email} - account recovery attempt`);
   } catch (error: unknown) {
     if (error instanceof Error) {
       logger.error(error.message);

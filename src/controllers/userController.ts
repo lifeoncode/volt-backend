@@ -31,7 +31,7 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
 
     const userCredentials = await getUserService(userId);
     res.status(200).json({ username: userCredentials.username, email: userCredentials.email });
-    logger.info(`user: ${userCredentials.email} fetched their user credentials`);
+    logger.info(`user: ${userId} fetched user details`);
   } catch (err) {
     if (err instanceof Error) {
       logger.error(err.message);
@@ -73,7 +73,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
 
     const updatedUser = await updateUserService(userId, newData);
     res.status(200).json(updatedUser);
-    logger.info(`user: ${req.user?.email} updated their user credentials`);
+    logger.info(`user: ${userId} updated details`);
   } catch (err) {
     if (err instanceof Error) {
       logger.error(err.message);
@@ -101,7 +101,7 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
     const userId: string | undefined = req.user?.userId;
     if (!userId) throw new Error("user session not found");
     await deleteUserService(userId);
-    logger.info(`user: ${req.user?.email} deleted their account`);
+    logger.info(`user: ${req.user?.email} deleted account`);
     res.status(200).json({ message: "user deleted" });
   } catch (err) {
     if (err instanceof Error) {
@@ -135,7 +135,7 @@ export const resetUserPassword = async (req: Request, res: Response) => {
     await updateUserPasswordService(email, hashedPassword);
 
     res.status(200).json("password reset successful");
-    logger.info(`user: ${email} changed their password`);
+    logger.info(`user: ${email} password changed`);
   } catch (err) {
     if (err instanceof Error) {
       logger.error(err.message);
