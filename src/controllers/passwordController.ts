@@ -54,7 +54,7 @@ export const createPasswordCredential = async (req: Request, res: Response): Pro
     });
 
     res.status(201).json(newPasswordCredential);
-    logger.info(`new credential: ${newPasswordCredential.id}`);
+    logger.info("new credential created");
   } catch (err: unknown) {
     if (err instanceof Error) {
       logger.error(err.message);
