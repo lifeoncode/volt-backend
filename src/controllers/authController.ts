@@ -7,14 +7,14 @@ import {
   recoverService,
   verifyOTPService,
   storeRecoveryOTPService,
-} from "../services/auth.service";
+} from "../services/authService";
 import logger from "../middleware/logger";
 import jwt from "jsonwebtoken";
-import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from "../middleware/auth.middleware";
+import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from "../middleware/authMiddleware";
 import path from "node:path";
 import fs from "node:fs";
 import { JWTPayload } from "../util/interface";
-import { getUserService } from "../services/user.service";
+import { getUserService } from "../services/userService";
 
 /**
  * @controller register
@@ -116,7 +116,7 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
       path: "/",
     });
 
-    res.status(200).json({ message: "logged out" });
+    res.status(200).json("logged out");
     logger.info(`${req.user?.email} logout success`);
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -190,7 +190,7 @@ export const recover = async (req: Request, res: Response): Promise<void> => {
     const emailSent = await sendEmail(email, otp as string);
     if (!emailSent) throw new Error("Could not send email");
 
-    res.status(200).json({ message: `recovery email sent` });
+    res.status(200).json("recovery email sent");
     logger.info(`${email} - attempting to recover their account`);
   } catch (error: unknown) {
     if (error instanceof Error) {

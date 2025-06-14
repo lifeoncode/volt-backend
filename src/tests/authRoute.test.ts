@@ -23,8 +23,7 @@ describe("Auth API", () => {
     });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty("message");
-    expect(res.body.message).toBe("invalid credentials");
+    expect(res.body).toBe("invalid credentials");
   });
 });
 

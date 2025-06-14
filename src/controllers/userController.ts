@@ -6,7 +6,7 @@ import {
   getUserService,
   updateUserPasswordService,
   updateUserService,
-} from "../services/user.service";
+} from "../services/userService";
 import { User } from "../util/interface";
 import bcrypt from "bcryptjs";
 
@@ -77,7 +77,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
   } catch (err) {
     if (err instanceof Error) {
       logger.error(err.message);
-      res.status(resolveErrorType(err.message)).json({ message: err.message });
+      res.status(resolveErrorType(err.message)).json(err.message);
     }
   }
 };
@@ -134,12 +134,12 @@ export const resetUserPassword = async (req: Request, res: Response) => {
     const hashedPassword = bcrypt.hashSync(password, 10);
     await updateUserPasswordService(email, hashedPassword);
 
-    res.status(200).json({ message: "password reset successful" });
+    res.status(200).json("password reset successful");
     logger.info(`user: ${email} changed their password`);
   } catch (err) {
     if (err instanceof Error) {
       logger.error(err.message);
-      res.status(resolveErrorType(err.message)).json({ message: err.message });
+      res.status(resolveErrorType(err.message)).json(err.message);
     }
   }
 };

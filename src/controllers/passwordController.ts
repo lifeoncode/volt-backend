@@ -14,8 +14,8 @@ import {
   getAllPasswordCredentialsService,
   getSinglePasswordCredentialService,
   updatePasswordCredentialService,
-} from "../services/password.service";
-import { getUserService } from "../services/user.service";
+} from "../services/passwordService";
+import { getUserService } from "../services/userService";
 
 /**
  * @controller createPasswordCredential

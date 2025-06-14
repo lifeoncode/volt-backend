@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { login, logout, register, recover, validateRecovery, refreshToken } from "../controllers/auth.controller";
-import { resetUserPassword } from "../controllers/user.controller";
+import { login, logout, register, recover, validateRecovery, refreshToken } from "../controllers/authController";
+import { resetUserPassword } from "../controllers/userController";
 
 const router = Router();
 

@@ -1,7 +1,7 @@
 import { PrismaClient } from "../../generated/prisma";
 import { decryptPasswordCredential } from "../util/helper";
 import { PasswordCredential } from "../util/interface";
-import { getUserService } from "./user.service";
+import { getUserService } from "./userService";
 
 const prisma = new PrismaClient();
 

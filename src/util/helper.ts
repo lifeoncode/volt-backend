@@ -2,7 +2,11 @@ import { PasswordCredential } from "./interface";
 import CryptoJS from "crypto-js";
 import nodemailer from "nodemailer";
 import logger from "../middleware/logger";
-import { storeRecoveryOTPService } from "../services/auth.service";
+
+const EMAIL_HOST = process.env.EMAIL_HOST;
+const EMAIL_PORT = process.env.EMAIL_PORT;
+const EMAIL_ADDRESS = process.env.EMAIL_ADDRESS;
+const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
 
 /**
  * @func generateSecretKey
@@ -170,12 +174,12 @@ export const generateOTP = (): string => {
  */
 export const sendEmail = async (email: string, otp: string): Promise<boolean> => {
   const transporter = nodemailer.createTransport({
-    host: "mail.yellogarden.co.za",
-    port: 587,
+    host: EMAIL_HOST,
+    port: Number(EMAIL_PORT),
     secure: false,
     auth: {
-      user: "volt@yellogarden.co.za",
-      pass: "gc2uk44+vZ&D",
+      user: EMAIL_ADDRESS,
+      pass: EMAIL_PASSWORD,
     },
     tls: {
       rejectUnauthorized: false,
@@ -195,7 +199,7 @@ export const sendEmail = async (email: string, otp: string): Promise<boolean> =>
 `;
 
   const mailOptions = {
-    from: "volt@yellogarden.co.za",
+    from: EMAIL_ADDRESS,
     to: email,
     subject: "Volt account recovery",
     html: emailContent,
