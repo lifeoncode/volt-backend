@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config({ path: ".env" });
 import cookieParser from "cookie-parser";
+import bodyParser from "body-parser";
+import { rateLimit } from "express-rate-limit";
 import { routeError } from "./middleware/routeError";
 import authRoutes from "./routes/authRoute";
 import passwordRoutes from "./routes/passwordRoute";
@@ -18,6 +20,10 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: false }));
+
+const limiter = rateLimit({ windowMs: 10 * 60 * 1000, limit: 100 });
+app.use(limiter);
 
 app.use("/volt/api/auth", authRoutes);
 app.use("/volt/api/password", passwordRoutes);
