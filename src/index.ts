@@ -13,7 +13,12 @@ import userRoutes from "./routes/userRoute";
 export const app = express();
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:4173", "https://voltsec.vercel.app"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:4173",
+      "https://voltsec.vercel.app",
+      "https://voltpassword.xyz",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })

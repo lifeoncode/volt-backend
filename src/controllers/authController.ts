@@ -11,10 +11,9 @@ import {
 import logger from "../middleware/logger";
 import jwt from "jsonwebtoken";
 import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from "../middleware/authMiddleware";
-import path from "node:path";
-import fs from "node:fs";
 import { JWTPayload } from "../util/interface";
 import { getUserService } from "../services/userService";
+import crypto from "crypto";
 
 /**
  * @controller register
@@ -73,6 +72,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const user = await loginService(email, password);
     const accessToken = jwt.sign({ userId: user.id, email: user.email }, JWT_ACCESS_SECRET, { expiresIn: "15m" });
     const refreshToken = jwt.sign({ userId: user.id, email: user.email }, JWT_REFRESH_SECRET, { expiresIn: "7d" });
+    const csrfToken = crypto.randomBytes(32).toString("hex");
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
@@ -80,6 +80,12 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
       path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.cookie("csrf_token", csrfToken, {
+      httpOnly: false,
+      sameSite: "strict",
+      secure: true,
     });
 
     res.status(200).json({ username: user.username, email: user.email, token: accessToken });

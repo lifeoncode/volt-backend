@@ -20,10 +20,18 @@ export const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET!;
  */
 export const authenticate = (req: Request, res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
+  const csrfHeader = req.headers["x-csrf-token"];
+  const csrfCookie = req.cookies["csrf_token"];
+
+  if (!csrfHeader || !csrfCookie || csrfHeader !== csrfCookie) {
+    res.status(403).json({ message: "CSRF token mismatch" });
+    return;
+  }
+  console.log("GOT COOKIE:", csrfCookie);
+
   if (!authHeader?.startsWith("Bearer ")) {
     res.status(401).json("unauthorized");
     logger.error("unauthorized");
-
     return;
   }
 
