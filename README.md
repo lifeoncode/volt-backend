@@ -5,7 +5,7 @@ Volt is a secure, modern password manager. This is the backend service powering 
 # 🧭 Table of Contents
 
 - [📦️ Tech Stack](#️-tech-stack)
-- [🧮 Architecture](#️-architecture)
+- [🧮 Architecture](#-architecture)
 - [✨ Features](#-features)
 - [🚀 Getting Started](#-getting-started)
 - [🧪 Environment Variables](#-environment-variables)
@@ -18,15 +18,15 @@ Volt is a secure, modern password manager. This is the backend service powering 
 
 ### 📦️ Tech Stack
 
-- Language: TypeScript
-- Runtime: Node.js
-- Framework: Express
-- ORM: Prisma
-- Database: PostgreSQL
-- Authentication: JWT (Access & Refresh tokens), Cookies
-- Hashing & Encryption: bcrypt, Crypto (AES-256)
-- Containerization: Docker (planned)
-- Hosting: DigitalOcean VPS (planned)
+- **Language:** TypeScript
+- **Runtime:** Node.js
+- **Framework:** Express
+- **ORM:** Prisma
+- **Database:** PostgreSQL
+- **Authentication:** JWT (Access & Refresh tokens), Cookies
+- **Hashing & Encryption:** bcrypt, Crypto (AES-256)
+- **Containerization:** Docker (planned)
+- **Hosting:** DigitalOcean VPS (planned)
 
 ### 🧮 Architecture
 
@@ -63,8 +63,8 @@ To run this application in your local environment, you're gonna need a few thing
 Clone the Repository
 
 ```
-git clone https://github.com/lifeoncode/volt-api.git
-cd volt-api
+git clone https://github.com/lifeoncode/volt-backend.git
+cd volt-backend
 npm install
 ```
 
@@ -84,7 +84,7 @@ Server will run on either http://localhost:4000 or http://localhost:8000 by defa
 
 ### 🧪 Environment Variables
 
-See .env.example for all available variables and instructions.
+See [.env.example](.env.example) for all available variables and instructions.
 
 ## 👨‍🔬 Testing
 
@@ -115,84 +115,72 @@ In Progress: Volt will support full OpenAPI (Swagger) documentation soon.
 Basic route overview:
 
 ```
-
 POST /volt/api/auth/register
-
 ```
 
 Registers a new user
 
 ```
-
 POST /volt/api/auth/login
-
 ```
 
 Logs in and sets auth cookies
 
 ```
-
 GET /volt/api/user
-
 ```
 
 Get logged-in user account details
 
 ```
-
 PUT /volt/api/user/
-
 ```
 
 Update logged-in user account details
 
 ```
-
 DELETE /volt/api/user
-
 ```
 
 Delete logged-in user account
 
 ```
-
-GET /volt/api/vault
-
+GET /volt/api/password
 ```
 
 Get all secrets for the logged-in user
 
 ```
+GET /volt/api/password/:id
+```
 
-POST /volt/api/vault
+Get single secret for the logged-in user
 
+```
+POST /volt/api/password
 ```
 
 Add a new password/secret
 
 ```
-
-PUT /volt/api/vault/:id
-
+PUT /volt/api/password/:id
 ```
 
 Update a secret
 
 ```
-
-DELETE /volt/api/vault/:id
-
+DELETE /volt/api/password/:id
 ```
 
 Delete a secret
 
 ### 🔒 Security
 
-- 🔐 All passwords and secrets are hashed/encrypted using industry standards (bcrypt, AES-256-GCM).
+- 🔐 All passwords and secrets are hashed/encrypted using (bcrypt, Crypto, AES-256-GCM).
 - 🛡️ Follows OWASP best practices.
-- 🧼 Input sanitization & strict validation (zod / joi / etc.)
-- 🕵️ Secure cookies (HttpOnly, SameSite, Secure in production)
-- ⚠️ Secrets stored encrypted at rest
+- 🧼 Input sanitization & strict validation
+- 🕵️ Secure cookies (HttpOnly, SameSite, Short-lived)
+- ⚠️ Secrets stored encrypted (decryption performed on authenticated query)
 
 ### 🧬 Database Schema
 
@@ -232,7 +220,7 @@ PRs and suggestions welcome! If you’d like to contribute:
 
 - Fork the repo
 - Create your feature branch (git checkout -b feature/your-feature)
-- Commit your changes (git commit -m 'Add feature')
+- Commit your changes (git commit -am 'New feature')
 - Push to the branch (git push origin feature/your-feature)
 - Open a Pull Request
 
