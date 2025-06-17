@@ -5,7 +5,7 @@ dotenv.config({ path: ".env" });
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import { rateLimit } from "express-rate-limit";
-import { routeError } from "./middleware/routeError";
+import { errorHandler, NotFoundError } from "./middleware/errors";
 import statusRoute from "./routes/statusRoute";
 import authRoutes from "./routes/authRoute";
 import passwordRoutes from "./routes/passwordRoute";
@@ -35,4 +35,8 @@ app.use("/volt/api/status", statusRoute);
 app.use("/volt/api/auth", authRoutes);
 app.use("/volt/api/password", passwordRoutes);
 app.use("/volt/api/user", userRoutes);
-app.use(routeError);
+
+app.use(() => {
+  throw new NotFoundError("Route not found");
+});
+app.use(errorHandler);
