@@ -1,4 +1,4 @@
-export interface User {
+export type User = {
   id?: string;
   username: string;
   email: string;
@@ -6,14 +6,14 @@ export interface User {
   secret_key?: string;
   createdAt?: Date | string;
   updatedAt?: Date | string;
-}
+};
 
-export interface JWTPayload {
+export type JWTPayload = {
   userId: string;
   email: string;
-}
+};
 
-export interface PasswordCredential {
+export type PasswordCredential = {
   id?: string;
   user?: any;
   user_id?: string;
@@ -23,4 +23,4 @@ export interface PasswordCredential {
   notes?: string | null;
   createdAt?: string | Date;
   updatedAt?: string | Date;
-}
+};
