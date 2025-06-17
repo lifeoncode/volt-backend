@@ -4,6 +4,7 @@ import { resetUserPassword } from "../controllers/userController";
 import {
   accountRecoveryValidationSchema,
   loginValidationSchema,
+  passwordResetValidationSchema,
   recoverValidationSchema,
   registerValidationSchema,
 } from "../middleware/validationSchemas";
@@ -21,7 +22,7 @@ router.post("/logout", logout);
 router.post("/register", registerValidationSchema, register);
 router.post("/recover", recoverValidationSchema, recover);
 router.post("/recover/validate", accountRecoveryValidationSchema, validateRecovery);
-router.post("/recover/reset", resetUserPassword);
+router.post("/recover/reset", passwordResetValidationSchema, resetUserPassword);
 router.post("/refresh-token", refreshToken);
 
 export default router;

@@ -1,0 +1,26 @@
+const expressValidator = require("express-validator");
+const { body } = expressValidator;
+
+export const registerValidationSchema = [
+  body("username").notEmpty().withMessage("Username required"),
+  body("email").isEmail().withMessage("Valid email required"),
+  body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters"),
+];
+
+export const loginValidationSchema = [
+  body("email").isEmail().withMessage("Valid email required"),
+  body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters"),
+];
+
+export const recoverValidationSchema = [body("email").isEmail().withMessage("Valid email required")];
+
+export const accountRecoveryValidationSchema = [
+  body("email").isEmail().withMessage("Valid email required"),
+  body("otp").isLength({ min: 4 }).withMessage("Valid OTP required"),
+];
+
+export const passwordResetValidationSchema = [
+  body("email").isEmail().withMessage("Valid email required"),
+  body("otp").isLength({ min: 4 }).withMessage("Valid OTP required"),
+  body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters"),
+];

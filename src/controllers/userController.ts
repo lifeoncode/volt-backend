@@ -9,6 +9,9 @@ import {
 } from "../services/userService";
 import { User } from "../util/interface";
 import bcrypt from "bcryptjs";
+import { BadRequestError, UnprocessableEntityError } from "../middleware/errors";
+const expressValidator = require("express-validator");
+const { validationResult } = expressValidator;
 
 /**
  * @controller getUser
@@ -126,20 +129,17 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
  * Logs the password reset event with the user's email address on success. Logs the error message on failure.
  */
 export const resetUserPassword = async (req: Request, res: Response) => {
-  try {
-    const { otp, email, password } = req.body;
-    if (!otp || !email || !password) throw new Error("missing credentials");
-    if (password.length < 8) throw new Error("invalid password length");
-
-    const hashedPassword = bcrypt.hashSync(password, 10);
-    await updateUserPasswordService(email, hashedPassword);
-
-    res.status(200).json("password reset successful");
-    logger.info(`user: ${email} password changed`);
-  } catch (err) {
-    if (err instanceof Error) {
-      logger.error(err.message);
-      res.status(resolveErrorType(err.message)).json(err.message);
-    }
+  const { email, password } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const err = errors.array()[0];
+    if (!err.value) throw new BadRequestError(err.msg);
+    throw new UnprocessableEntityError(err.msg);
   }
+
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  await updateUserPasswordService(email, hashedPassword);
+
+  res.status(200).json("password reset successful");
+  logger.info(`user: ${email} password changed`);
 };
