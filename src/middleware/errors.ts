@@ -69,7 +69,7 @@ export class ServiceUnavailableError extends AppError {
 }
 
 export class BadGatewayError extends AppError {
-  constructor(message = "Internal server error") {
+  constructor(message = "External service communication error") {
     super(message, 502);
   }
 }
