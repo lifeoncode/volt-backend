@@ -2,7 +2,7 @@
 
 Volt is a secure, modern password manager. This is the backend service powering the Volt ecosystem - including the web app, mobile app, and browser extension. This API handles user authentication, vault storage, encryption, and more.
 
-# 🧭 Table of Contents
+### 🧭 Table of Contents
 
 - [📦️ Tech Stack](#️-tech-stack)
 - [🧮 Architecture](#-architecture)
@@ -42,14 +42,14 @@ Volt follows a modular architecture with a clear separation of concerns:
 
 Some of the features listed below are planned features that are work in progress
 
-- 🔐 User Authentication (Sign up, login, logout)
-- 🧠 Password Vault (CRUD secrets/passwords)
-- 🔄 Token Refresh with rotating refresh tokens
-- 🧊 End-to-End Encryption for user vaults
-- 🛡️ Security Best Practices (Helmet, rate limiting, etc.)
-- 🔍 Audit Logs (planned)
-- 📊 Password health reports (planned)
-- ⚠️ Regular vulnerability scans (planned)
+- User Authentication (Sign up, login, logout)
+- Password Vault (CRUD secrets/passwords)
+- Token Refresh with rotating refresh tokens
+- End-to-End Encryption for user vaults
+- Security Best Practices (Helmet, rate limiting, etc.)
+- Audit Logs (planned)
+- Password health reports (planned)
+- Regular vulnerability scans (planned)
 
 ### 🚀 Getting Started
 
@@ -86,7 +86,7 @@ Server will run on either http://localhost:4000 or http://localhost:8000 by defa
 
 See [.env.example](.env.example) for all available variables and instructions.
 
-## 👨‍🔬 Testing
+### 👨‍🔬 Testing
 
 Volt backend/API uses [Jest](https://jestjs.io/) and [Supertest](https://github.com/ladjs/supertest) for testing.
 
@@ -104,7 +104,7 @@ Tests cover:
 - Security edge case
 - Helper functions
 
-## 🤖 Continuous Integration (CI)
+### 🤖 Continuous Integration (CI)
 
 Volt uses GitHub Actions for Continuous Integration. All tests are automatically run on every push or pull request to the main branch. Have a look at the [.github/workflows/ci.yml](.github/workflows/ci.yml) for steps included in this process.
 
@@ -177,10 +177,10 @@ Delete a secret
 ### 🔒 Security
 
 - 🔐 All passwords and secrets are hashed/encrypted using (bcrypt, Crypto, AES-256-GCM).
-- 🛡️ Follows OWASP best practices.
-- 🧼 Input sanitization & strict validation
-- 🕵️ Secure cookies (HttpOnly, SameSite, Short-lived)
-- ⚠️ Secrets stored encrypted (decryption performed on authenticated query)
+- Follows OWASP best practices.
+- Input sanitization & strict validation
+- Secure cookies (HttpOnly, SameSite, Short-lived)
+- Secrets stored encrypted (decryption performed on authenticated query)
 
 ### 🧬 Database Schema
 

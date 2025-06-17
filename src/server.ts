@@ -1,4 +1,9 @@
 import { app } from "./index";
 
 const PORT = process.env.PORT || 4000 || 8000;
-app.listen(PORT, () => console.log(`....Server started on ${PORT}....`));
+
+const initServer = async () => {
+  app.listen(PORT, () => console.log(`....Server's running🚀 -> http://127.0.0.1:${PORT}....`));
+};
+
+initServer();
