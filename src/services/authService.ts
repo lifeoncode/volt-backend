@@ -1,6 +1,7 @@
 import { PrismaClient } from "../../generated/prisma";
 import bcrypt from "bcryptjs";
 import { User } from "../util/interface";
+import { BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../middleware/errors";
 
 const prisma = new PrismaClient();
 
@@ -24,12 +25,12 @@ export const registerService = async (
   secret: string
 ): Promise<User> => {
   const existingUser = await prisma.user.findUnique({ where: { email } });
-  if (existingUser) throw new Error("user already exists");
+  if (existingUser) throw new ConflictError("User already exists");
 
   const existingUsername = await prisma.user.findUnique({
     where: { username },
   });
-  if (existingUsername) throw new Error("username taken");
+  if (existingUsername) throw new ConflictError("Username taken");
 
   const newUser = await prisma.user.create({
     data: { username, email, password, secret_key: secret },
@@ -51,16 +52,17 @@ export const registerService = async (
  */
 export const loginService = async (email: string, password: string): Promise<Record<string, unknown>> => {
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) throw new Error("user not found");
+  if (!user) throw new NotFoundError("User not found");
+
   const passwordMatch = bcrypt.compareSync(password, user.password);
-  if (!passwordMatch) throw new Error("invalid credentials");
+  if (!passwordMatch) throw new BadRequestError("Invalid credentials");
 
   return { id: user.id, username: user.username, email: user.email };
 };
 
 export const recoverService = async (email: string) => {
   const accountFound = await prisma.user.findUnique({ where: { email } });
-  if (!accountFound) throw new Error("user not found");
+  if (!accountFound) throw new NotFoundError("User not found");
 
   return email;
 };
@@ -77,10 +79,14 @@ export const recoverService = async (email: string) => {
  * @returns {string}
  */
 export const storeRecoveryOTPService = async (email: string, otp: string): Promise<string | undefined> => {
-  await recoverService(email);
-  const { recovery_otp } = await prisma.user.update({ where: { email }, data: { recovery_otp: otp } });
+  try {
+    await recoverService(email);
+    const { recovery_otp } = await prisma.user.update({ where: { email }, data: { recovery_otp: otp } });
 
-  return recovery_otp?.toString();
+    return recovery_otp?.toString();
+  } catch (error) {
+    throw new InternalServerError();
+  }
 };
 
 /**
@@ -98,7 +104,7 @@ export const verifyOTPService = async (email: string, otp: string): Promise<stri
   await recoverService(email);
 
   const otpMatch = await prisma.user.findFirst({ where: { recovery_otp: otp } });
-  if (!otpMatch) throw new Error("invalid OTP");
+  if (!otpMatch) throw new BadRequestError("Invalid OTP");
 
   return "valid OTP";
 };
