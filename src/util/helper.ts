@@ -7,6 +7,31 @@ const EMAIL_HOST = process.env.EMAIL_HOST;
 const EMAIL_PORT = process.env.EMAIL_PORT;
 const EMAIL_ADDRESS = process.env.EMAIL_ADDRESS;
 const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
+const ENVIRONMENT = process.env.NODE_ENV;
+
+/**
+ * @func isDev
+ *
+ * @description
+ * Checks if application is running in development environment.
+ *
+ * @returns {Boolean}
+ */
+export const isDev = (): boolean => {
+  return ENVIRONMENT === "development";
+};
+
+/**
+ * @func isDev
+ *
+ * @description
+ * Checks if application is running in production environment.
+ *
+ * @returns {Boolean}
+ */
+export const isProd = (): boolean => {
+  return ENVIRONMENT === "production";
+};
 
 /**
  * @func generateSecretKey
