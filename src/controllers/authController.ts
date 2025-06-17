@@ -11,7 +11,7 @@ import {
 import logger from "../middleware/logger";
 import jwt from "jsonwebtoken";
 import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from "../middleware/authMiddleware";
-import { JWTPayload } from "../util/interface";
+import { JWTPayload } from "../util/types";
 import { getUserService } from "../services/userService";
 import crypto from "crypto";
 import {

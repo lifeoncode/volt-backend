@@ -1,6 +1,6 @@
 import { PrismaClient } from "../../generated/prisma";
 import bcrypt from "bcryptjs";
-import { User } from "../util/interface";
+import { User } from "../util/types";
 import { BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../middleware/errors";
 
 const prisma = new PrismaClient();

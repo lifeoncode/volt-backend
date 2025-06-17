@@ -8,6 +8,7 @@ import {
   updatePasswordCredential,
 } from "../controllers/passwordController";
 import { authenticate } from "../middleware/authMiddleware";
+import { passwordCredentialValidationSchema } from "../middleware/validationSchemas";
 
 const router = Router();
 
@@ -20,7 +21,7 @@ const router = Router();
  * @requires user authentication
  */
 router.use(authenticate);
-router.post("/", createPasswordCredential);
+router.post("/", passwordCredentialValidationSchema, createPasswordCredential);
 router.get("/", getAllPasswordCredentials);
 router.get("/:id", getSinglePasswordCredential);
 router.put("/:id", updatePasswordCredential);

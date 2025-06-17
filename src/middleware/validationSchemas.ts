@@ -24,3 +24,9 @@ export const passwordResetValidationSchema = [
   body("otp").isLength({ min: 4 }).withMessage("Valid OTP required"),
   body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters"),
 ];
+
+export const passwordCredentialValidationSchema = [
+  body("service").notEmpty().withMessage("Service required"),
+  body("service_user_id").notEmpty().withMessage("Service_user_id required"),
+  body("password").notEmpty().withMessage("Password required"),
+];

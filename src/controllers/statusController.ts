@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import logger from "../middleware/logger";
+import { InternalServerError } from "../middleware/errors";
 
 export const serverStatus = async (req: Request, res: Response) => {
   try {
@@ -10,7 +11,7 @@ export const serverStatus = async (req: Request, res: Response) => {
     });
     logger.info("status check...");
   } catch (error) {
-    console.log(error);
-    res.status(500).json(error);
+    logger.error(error);
+    throw new InternalServerError();
   }
 };

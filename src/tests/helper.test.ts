@@ -1,4 +1,4 @@
-import { PasswordCredential } from "../util/interface";
+import { PasswordCredential } from "../util/types";
 import {
   decryptData,
   decryptPasswordCredential,

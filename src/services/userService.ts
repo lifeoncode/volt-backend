@@ -1,5 +1,6 @@
 import { PrismaClient } from "../../generated/prisma";
-import { User } from "../util/interface";
+import { NotFoundError } from "../middleware/errors";
+import { User } from "../util/types";
 
 const prisma = new PrismaClient();
 
@@ -17,7 +18,7 @@ export const getUserService = async (userId: string): Promise<User> => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });
-  if (!user) throw new Error("user not found");
+  if (!user) throw new NotFoundError("User not found");
 
   return user;
 };
@@ -58,7 +59,7 @@ export const updateUserPasswordService = async (email: string, newPassword: stri
   const user = await prisma.user.findUnique({
     where: { email },
   });
-  if (!user) throw new Error("user not found");
+  if (!user) throw new NotFoundError("User not found");
   const updatedUser = await prisma.user.update({ where: { email }, data: { password: newPassword } });
 
   return updatedUser;

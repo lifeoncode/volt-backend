@@ -1,6 +1,7 @@
 import { PrismaClient } from "../../generated/prisma";
+import { ConflictError, NotFoundError } from "../middleware/errors";
 import { decryptPasswordCredential } from "../util/helper";
-import { PasswordCredential } from "../util/interface";
+import { PasswordCredential } from "../util/types";
 import { getUserService } from "./userService";
 
 const prisma = new PrismaClient();
@@ -25,7 +26,7 @@ export const createPasswordCredentialService = async (
   const existingPasswordCredential = await prisma.passwordCredential.findFirst({
     where: { service: decryptedData.service, service_user_id: decryptedData.service_user_id },
   });
-  if (existingPasswordCredential) throw new Error("credential already exists");
+  if (existingPasswordCredential) throw new ConflictError("Credential already exists");
 
   const newPasswordCredential = await prisma.passwordCredential.create({
     data: {
@@ -72,10 +73,10 @@ export const getSinglePasswordCredentialService = async (
   const credentials = await prisma.passwordCredential.findMany({
     where: { user_id: userId },
   });
-  if (credentials.length === 0) throw new Error("No credentials found");
+  if (credentials.length === 0) throw new NotFoundError("No credentials found");
 
   const matchedCredential = credentials.find((item) => item.id === credentialId);
-  if (!matchedCredential) throw new Error("No credentials found");
+  if (!matchedCredential) throw new NotFoundError("No credentials found");
 
   return matchedCredential;
 };
@@ -100,7 +101,7 @@ export const updatePasswordCredentialService = async (
   const matchedCredential = await prisma.passwordCredential.findFirst({
     where: { user_id: userId, id: credentialId },
   });
-  if (!matchedCredential) throw new Error("No credentials found");
+  if (!matchedCredential) throw new NotFoundError("No credentials found");
 
   return prisma.passwordCredential.update({
     where: { user_id: userId, id: credentialId },
@@ -126,7 +127,7 @@ export const deletePasswordCredentialService = async (
   const matchedCredential = await prisma.passwordCredential.findFirst({
     where: { user_id: userId, id: credentialId },
   });
-  if (!matchedCredential) throw new Error("No credentials found");
+  if (!matchedCredential) throw new NotFoundError("No credentials found");
 
   return prisma.passwordCredential.delete({
     where: { user_id: userId, id: credentialId },
@@ -145,7 +146,7 @@ export const deletePasswordCredentialService = async (
  */
 export const deleteAllPasswordCredentialsService = async (userId: string): Promise<Record<string, unknown>> => {
   const credentials = await getAllPasswordCredentialsService(userId);
-  if (credentials.length === 0) throw new Error("no credentials found");
+  if (credentials.length === 0) throw new NotFoundError("No credentials found");
 
   return await prisma.passwordCredential.deleteMany({ where: { user_id: userId } });
 };

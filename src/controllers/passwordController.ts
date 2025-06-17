@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { PasswordCredential } from "../util/interface";
+import { PasswordCredential } from "../util/types";
 import logger from "../middleware/logger";
 import {
   decryptPasswordCredential,
@@ -16,6 +16,9 @@ import {
   updatePasswordCredentialService,
 } from "../services/passwordService";
 import { getUserService } from "../services/userService";
+import { BadRequestError, UnprocessableEntityError } from "../middleware/errors";
+const expressValidator = require("express-validator");
+const { validationResult } = expressValidator;
 
 /**
  * @controller createPasswordCredential
@@ -32,36 +35,33 @@ import { getUserService } from "../services/userService";
  * Logs the creation of a new password credential with the userId on success. Logs the error message on failure.
  */
 export const createPasswordCredential = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const userId: string | undefined = req.user?.userId;
-    if (!userId) throw new Error("user session not found");
+  const userId: string | undefined = req.user?.userId;
+  if (!userId) throw new BadRequestError("User session not found");
 
-    const { service, service_user_id, password, notes }: PasswordCredential = req.body;
-    if (!service || !service_user_id || !password) throw new Error("missing credentials");
-
-    const { secret_key: secret } = await getUserService(userId);
-    const { service_user_id: encryptedServiceId, password: encryptedPassword } = encryptPasswordCredential(
-      { service, service_user_id, password, notes, user: userId },
-      secret as string
-    );
-
-    const newPasswordCredential = await createPasswordCredentialService(userId, {
-      service,
-      service_user_id: encryptedServiceId,
-      password: encryptedPassword,
-      user: userId,
-      notes,
-    });
-
-    res.status(201).json(newPasswordCredential);
-    logger.info("new credential created");
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      logger.error(err.message);
-      const errorType: number = resolveErrorType(err.message);
-      res.status(errorType).json(err.message);
-    }
+  const { service, service_user_id, password, notes }: PasswordCredential = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const err = errors.array()[0];
+    if (!err.value) throw new BadRequestError(err.msg);
+    throw new UnprocessableEntityError(err.msg);
   }
+
+  const { secret_key: secret } = await getUserService(userId);
+  const { service_user_id: encryptedServiceId, password: encryptedPassword } = encryptPasswordCredential(
+    { service, service_user_id, password, notes, user: userId },
+    secret as string
+  );
+
+  const newPasswordCredential = await createPasswordCredentialService(userId, {
+    service,
+    service_user_id: encryptedServiceId,
+    password: encryptedPassword,
+    user: userId,
+    notes,
+  });
+
+  res.status(201).json(newPasswordCredential);
+  logger.info("new credential created");
 };
 
 /**
@@ -81,7 +81,7 @@ export const createPasswordCredential = async (req: Request, res: Response): Pro
 export const getAllPasswordCredentials = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: string | undefined = req.user?.userId;
-    if (!userId) throw new Error("user session not found");
+    if (!userId) throw new BadRequestError("User session not found");
 
     const passwordCredentials = await getAllPasswordCredentialsService(userId);
 
@@ -118,7 +118,7 @@ export const getAllPasswordCredentials = async (req: Request, res: Response): Pr
 export const getSinglePasswordCredential = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: string | undefined = req.user?.userId;
-    if (!userId) throw new Error("user session not found");
+    if (!userId) throw new BadRequestError("User session not found");
 
     const { id } = req.params;
     const credential = await getSinglePasswordCredentialService(userId, id);
@@ -154,11 +154,11 @@ export const getSinglePasswordCredential = async (req: Request, res: Response): 
 export const updatePasswordCredential = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: string | undefined = req.user?.userId;
-    if (!userId) throw new Error("user session not found");
+    if (!userId) throw new BadRequestError("User session not found");
 
     const { id } = req.params;
     const { service, service_user_id, password, notes } = req.body;
-    if (!service && !service_user_id && !password && !notes) throw new Error("missing credentials");
+    if (!service && !service_user_id && !password && !notes) throw new BadRequestError("Missing credentials");
 
     const newCredentialData = { service, service_user_id, password, notes };
 
@@ -198,7 +198,7 @@ export const updatePasswordCredential = async (req: Request, res: Response): Pro
 export const deletePasswordCredential = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: string | undefined = req.user?.userId;
-    if (!userId) throw new Error("user session not found");
+    if (!userId) throw new BadRequestError("User session not found");
 
     const { id } = req.params;
     const deletedCredential = await deletePasswordCredentialService(userId, id);
@@ -231,7 +231,7 @@ export const deletePasswordCredential = async (req: Request, res: Response): Pro
 export const deleteAllPasswordCredentials = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId: string | undefined = req.user?.userId;
-    if (!userId) throw new Error("user session not found");
+    if (!userId) throw new BadRequestError("User session not found");
 
     const data = await deleteAllPasswordCredentialsService(userId);
     res.status(200).json(data);

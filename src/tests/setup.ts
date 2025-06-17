@@ -1,11 +1,12 @@
 import dotenv from "dotenv";
 import { execSync } from "child_process";
 import "../custom.d.ts";
+import { InternalServerError } from "../middleware/errors";
 
 dotenv.config({ path: ".env.test" });
 
 if (!process.env.DATABASE_URL?.includes("volt_test")) {
-  throw new Error("Not using test database! Aborting tests.");
+  throw new InternalServerError("Not using test database! Aborting tests.");
 }
 
 execSync("npx prisma generate", { stdio: "inherit" });

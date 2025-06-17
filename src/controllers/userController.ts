@@ -7,7 +7,7 @@ import {
   updateUserPasswordService,
   updateUserService,
 } from "../services/userService";
-import { User } from "../util/interface";
+import { User } from "../util/types";
 import bcrypt from "bcryptjs";
 import { BadRequestError, UnprocessableEntityError } from "../middleware/errors";
 const expressValidator = require("express-validator");
@@ -28,19 +28,13 @@ const { validationResult } = expressValidator;
  * Logs the User retrieval event with the user's email address on success. Logs the error message on failure.
  */
 export const getUser = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const userId: string | undefined = req.user?.userId;
-    if (!userId) throw new Error("user session not found");
+  const userId: string | undefined = req.user?.userId;
+  if (!userId) throw new BadRequestError("User session not found");
 
-    const userCredentials = await getUserService(userId);
-    res.status(200).json({ username: userCredentials.username, email: userCredentials.email });
-    logger.info(`user: ${userId} fetched user details`);
-  } catch (err) {
-    if (err instanceof Error) {
-      logger.error(err.message);
-      res.status(resolveErrorType(err.message)).json({ message: err.message });
-    }
-  }
+  const userCredentials = await getUserService(userId);
+
+  res.status(200).json({ username: userCredentials.username, email: userCredentials.email });
+  logger.info(`user: ${userId} fetched user details`);
 };
 
 /**
@@ -58,31 +52,24 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
  * Logs the User updating event with the user's email address on success. Logs the error message on failure.
  */
 export const updateUser = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const userId: string | undefined = req.user?.userId;
-    if (!userId) throw new Error("user session not found");
+  const userId: string | undefined = req.user?.userId;
+  if (!userId) throw new BadRequestError("User session not found");
 
-    const { username, email, password }: User = req.body;
-    if (!username && !email && !password) throw new Error("missing credentials");
+  const { username, email, password }: User = req.body;
+  if (!username && !email && !password) throw new BadRequestError("Username, Email or Password required");
 
-    let newData: Record<string, any> = {};
-    if (username) newData.username = username;
-    if (email) newData.email = email;
-    if (password) {
-      if (password.length < 8) throw new Error("invalid password length");
-      const hashedPassword = bcrypt.hashSync(password, 10);
-      newData.password = hashedPassword;
-    }
-
-    const updatedUser = await updateUserService(userId, newData);
-    res.status(200).json(updatedUser);
-    logger.info(`user: ${userId} updated details`);
-  } catch (err) {
-    if (err instanceof Error) {
-      logger.error(err.message);
-      res.status(resolveErrorType(err.message)).json(err.message);
-    }
+  let newData: Record<string, any> = {};
+  if (username) newData.username = username;
+  if (email) newData.email = email;
+  if (password) {
+    if (password.length < 8) throw new BadRequestError("Password must be at least 8 characters");
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    newData.password = hashedPassword;
   }
+
+  const updatedUser = await updateUserService(userId, newData);
+  res.status(200).json(updatedUser);
+  logger.info(`user: ${userId} updated details`);
 };
 
 /**
@@ -100,18 +87,13 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
  * Logs the deletion event with the user's email address on success. Logs the error message on failure.
  */
 export const deleteUser = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const userId: string | undefined = req.user?.userId;
-    if (!userId) throw new Error("user session not found");
-    await deleteUserService(userId);
-    logger.info(`user: ${req.user?.email} deleted account`);
-    res.status(200).json({ message: "user deleted" });
-  } catch (err) {
-    if (err instanceof Error) {
-      logger.error(err.message);
-      res.status(resolveErrorType(err.message)).json(err.message);
-    }
-  }
+  const userId: string | undefined = req.user?.userId;
+  if (!userId) throw new BadRequestError("User session not found");
+
+  await deleteUserService(userId);
+
+  logger.info(`user: ${req.user?.email} deleted account`);
+  res.status(200).json({ message: "user deleted" });
 };
 
 /**

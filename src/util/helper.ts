@@ -1,7 +1,8 @@
-import { PasswordCredential } from "./interface";
+import { PasswordCredential } from "./types";
 import CryptoJS from "crypto-js";
 import nodemailer from "nodemailer";
 import logger from "../middleware/logger";
+import { InternalServerError } from "../middleware/errors";
 
 const EMAIL_HOST = process.env.EMAIL_HOST;
 const EMAIL_PORT = process.env.EMAIL_PORT;
@@ -57,7 +58,7 @@ export const generateSecretKey = (): string => {
  * @returns {String}
  */
 export const encryptData = (data: string | undefined | null, secretKey: string): string => {
-  if (!data) throw new Error("No data provided for encryption");
+  if (!data) throw new InternalServerError("No data to encrypt");
   return CryptoJS.AES.encrypt(data, secretKey).toString();
 };
 
@@ -73,7 +74,7 @@ export const encryptData = (data: string | undefined | null, secretKey: string):
  * @returns {String}
  */
 export const decryptData = (data: string | undefined | null, secretKey: string): string => {
-  if (!data) throw new Error("No data provided for decryption");
+  if (!data) throw new InternalServerError("No data to decrypt");
   const bytes = CryptoJS.AES.decrypt(data, secretKey);
   return bytes.toString(CryptoJS.enc.Utf8);
 };
