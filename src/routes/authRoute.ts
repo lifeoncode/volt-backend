@@ -1,6 +1,12 @@
 import { Router } from "express";
 import { login, logout, register, recover, validateRecovery, refreshToken } from "../controllers/authController";
 import { resetUserPassword } from "../controllers/userController";
+import {
+  accountRecoveryValidationSchema,
+  loginValidationSchema,
+  recoverValidationSchema,
+  registerValidationSchema,
+} from "../middleware/validationSchemas";
 
 const router = Router();
 
@@ -10,11 +16,11 @@ const router = Router();
  * @description
  * Auth related routing
  */
-router.post("/login", login);
+router.post("/login", loginValidationSchema, login);
 router.post("/logout", logout);
-router.post("/register", register);
-router.post("/recover", recover);
-router.post("/recover/validate", validateRecovery);
+router.post("/register", registerValidationSchema, register);
+router.post("/recover", recoverValidationSchema, recover);
+router.post("/recover/validate", accountRecoveryValidationSchema, validateRecovery);
 router.post("/recover/reset", resetUserPassword);
 router.post("/refresh-token", refreshToken);
 

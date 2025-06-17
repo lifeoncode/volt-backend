@@ -14,7 +14,15 @@ import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from "../middleware/authMiddlew
 import { JWTPayload } from "../util/interface";
 import { getUserService } from "../services/userService";
 import crypto from "crypto";
-
+import {
+  BadGatewayError,
+  BadRequestError,
+  InternalServerError,
+  UnauthorizedError,
+  UnprocessableEntityError,
+} from "../middleware/errors";
+const expressValidator = require("express-validator");
+const { validationResult } = expressValidator;
 /**
  * @controller register
  *
@@ -30,24 +38,20 @@ import crypto from "crypto";
  * Logs the creation of a new user account with the user's email address on success. Logs the error message on failure.
  */
 export const register = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { username, email, password } = req.body;
-    if (!username || !email || !password) throw new Error("missing credentials");
-    if (password.length < 8) throw new Error("invalid password length");
-
-    const secret = generateSecretKey();
-    const hashedPassword = bcrypt.hashSync(password, 10);
-    await registerService(username, email, hashedPassword, secret);
-
-    res.status(201).json({ user: { username, email } });
-    logger.info(`new user registered: ${email}`);
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      logger.error(error.message);
-      const errorType: number = resolveErrorType(error.message);
-      res.status(errorType).json(error.message);
-    }
+  const { username, email, password } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const err = errors.array()[0];
+    if (!err.value) throw new BadRequestError(err.msg);
+    throw new UnprocessableEntityError(err.msg);
   }
+
+  const secret = generateSecretKey();
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  await registerService(username, email, hashedPassword, secret);
+
+  res.status(201).json({ user: { username, email } });
+  logger.info(`new user registered: ${email}`);
 };
 
 /**
@@ -65,38 +69,35 @@ export const register = async (req: Request, res: Response): Promise<void> => {
  * Logs login event with the user's email address on success. Logs the error message on failure.
  */
 export const login = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) throw new Error("missing credentials");
-
-    const user = await loginService(email, password);
-    const accessToken = jwt.sign({ userId: user.id, email: user.email }, JWT_ACCESS_SECRET, { expiresIn: "15m" });
-    const refreshToken = jwt.sign({ userId: user.id, email: user.email }, JWT_REFRESH_SECRET, { expiresIn: "7d" });
-    const csrfToken = crypto.randomBytes(32).toString("hex");
-
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
-      path: "/",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    res.cookie("csrf_token", csrfToken, {
-      httpOnly: false,
-      sameSite: "strict",
-      secure: true,
-    });
-
-    res.status(200).json({ username: user.username, email: user.email, token: accessToken });
-    logger.info(`${user.email} login success`);
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      logger.error(error.message);
-      const errorType: number = resolveErrorType(error.message);
-      res.status(errorType).json(error.message);
-    }
+  const { email, password } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const err = errors.array()[0];
+    if (!err.value) throw new BadRequestError(err.msg);
+    throw new UnprocessableEntityError(err.msg);
   }
+
+  const user = await loginService(email, password);
+  const accessToken = jwt.sign({ userId: user.id, email: user.email }, JWT_ACCESS_SECRET, { expiresIn: "15m" });
+  const refreshToken = jwt.sign({ userId: user.id, email: user.email }, JWT_REFRESH_SECRET, { expiresIn: "7d" });
+  const csrfToken = crypto.randomBytes(32).toString("hex");
+
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  res.cookie("csrf_token", csrfToken, {
+    httpOnly: false,
+    sameSite: "strict",
+    secure: true,
+  });
+
+  res.status(200).json({ username: user.username, email: user.email, token: accessToken });
+  logger.info(`${user.email} login success`);
 };
 
 /**
@@ -114,23 +115,15 @@ export const login = async (req: Request, res: Response): Promise<void> => {
  * Logs the logout event with the user's email address on success. Logs the error message on failure.
  */
 export const logout = async (req: Request, res: Response): Promise<void> => {
-  try {
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
-      path: "/",
-    });
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+    path: "/",
+  });
 
-    res.status(200).json("logged out");
-    logger.info("logout success");
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      logger.error(error.message);
-      const errorType: number = resolveErrorType(error.message);
-      res.status(errorType).json(error.message);
-    }
-  }
+  res.status(200).json("logged out");
+  logger.info("logout success");
 };
 
 /**
@@ -148,26 +141,18 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
  * Logs the token refresh event on success. Logs the error message on failure.
  */
 export const refreshToken = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) throw new Error("No refresh token found in cookies");
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) throw new UnauthorizedError("Refresh token not found");
 
-    req.user = jwt.verify(refreshToken, JWT_REFRESH_SECRET) as JWTPayload;
-    const accessToken = jwt.sign({ userId: req.user.userId, email: req.user.email }, JWT_ACCESS_SECRET, {
-      expiresIn: "15m",
-    });
+  req.user = jwt.verify(refreshToken, JWT_REFRESH_SECRET) as JWTPayload;
+  const accessToken = jwt.sign({ userId: req.user.userId, email: req.user.email }, JWT_ACCESS_SECRET, {
+    expiresIn: "15m",
+  });
 
-    const { username, email } = await getUserService(req.user.userId);
+  const { username, email } = await getUserService(req.user.userId);
 
-    res.status(200).json({ username, email, token: accessToken });
-    logger.info("new access token generated");
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      logger.error(error.message);
-      const errorType: number = resolveErrorType(error.message);
-      res.status(errorType).json(error.message);
-    }
-  }
+  res.status(200).json({ username, email, token: accessToken });
+  logger.info("new access token generated");
 };
 
 /**
@@ -185,26 +170,22 @@ export const refreshToken = async (req: Request, res: Response): Promise<void> =
  * Logs the account recovery event with the user's email address on success. Logs the error message on failure.
  */
 export const recover = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { email } = req.body;
-    if (!email) throw new Error("email required");
-
-    await recoverService(email);
-    const otp = await storeRecoveryOTPService(email, generateOTP());
-    if (!otp) throw new Error("could not store otp");
-
-    const emailSent = await sendEmail(email, otp as string);
-    if (!emailSent) throw new Error("Could not send email");
-
-    res.status(200).json("recovery email sent");
-    logger.info(`${email} - account recovery attempt`);
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      logger.error(error.message);
-      const errorType: number = resolveErrorType(error.message);
-      res.status(errorType).json(error.message);
-    }
+  const { email } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const err = errors.array()[0];
+    if (!err.value) throw new BadRequestError(err.msg);
+    throw new UnprocessableEntityError(err.msg);
   }
+
+  await recoverService(email);
+  const otp = await storeRecoveryOTPService(email, generateOTP());
+
+  const emailSent = await sendEmail(email, otp as string);
+  if (!emailSent) throw new BadGatewayError("Could not send email");
+
+  res.status(200).json("recovery email sent");
+  logger.info(`${email} - account recovery attempt`);
 };
 
 /**
@@ -222,19 +203,16 @@ export const recover = async (req: Request, res: Response): Promise<void> => {
  * Logs the creation of a new user account with the user's email address on success. Logs the error message on failure.
  */
 export const validateRecovery = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { email, otp } = req.body;
-    if (!email || !otp) throw new Error("missing credentials");
-
-    const verified = await verifyOTPService(email, otp);
-
-    res.status(200).json(verified);
-    logger.info(verified);
-  } catch (error) {
-    if (error instanceof Error) {
-      logger.error(error.message);
-      const errorType: number = resolveErrorType(error.message);
-      res.status(errorType).json(error.message);
-    }
+  const { email, otp } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const err = errors.array()[0];
+    if (!err.value) throw new BadRequestError(err.msg);
+    throw new UnprocessableEntityError(err.msg);
   }
+
+  const verified = await verifyOTPService(email, otp);
+
+  res.status(200).json(verified);
+  logger.info(verified);
 };
