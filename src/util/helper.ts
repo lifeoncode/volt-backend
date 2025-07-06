@@ -200,6 +200,8 @@ export const generateOTP = (): string => {
  * Logs email event on success. Logs error message on failure
  */
 export const sendEmail = async (email: string, otp: string): Promise<boolean> => {
+  const resetLink: string = isDev() ? "http://localhost:5173/recover/reset" : "https://voltpasswords.xyz/recover/reset";
+
   const transporter = nodemailer.createTransport({
     host: EMAIL_HOST,
     port: Number(EMAIL_PORT),
@@ -215,20 +217,25 @@ export const sendEmail = async (email: string, otp: string): Promise<boolean> =>
 
   const emailContent = `
   <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; padding: 20px; border: 1px solid #eee; border-radius: 8px; max-width: 800px; margin: auto;">
-    <h2 style="color:rgb(73, 24, 250);">Recover your account</h2>
-    <p>Hi there,</p>
-    <p>Looks like you're trying to recover your account for some reason. Here's your recovery pin:</p>
-    <div style="font-size:24px; font-weight:900; background-color:#eee; padding:5px 10px; border-radius:5px; display:inline-block;">${otp}</div>
-    <p style="margin-top: 20px;">If you didn't request this, ignore this email.</p>
-    <hr style="margin: 20px 0;">
-    <p style="font-size: 12px; color: #999;">This is an automated email from Volt, please do not reply.</p>
+    <h2 style="color:rgb(14, 12, 19); font-size:22px;">Hi there</h2>
+    <p style="font-size:18px; color:rgb(14, 12, 19);">It looks like you forgot your password. Click the button below to set a new one and get access to your account.</p>
+    <div style="padding:10px 0;">
+      <a href="${resetLink}" style="color:#fff; text-decoration:none;">
+        <div style="display:inline-block; background-color:rgb(73, 24, 250); border-radius:4px; padding:10px 20px; outline:none; border:0; font-size:16px;">Reset password</div>
+      </a>
+    </div>
+    <div style="padding:15px 0">
+      <p style="font-size:18px; color:rgb(14, 12, 19);">If you didn't request this, please ignore this email.</p>
+    </div>
+    <hr style="margin: 10px 0;">
+    <p style="font-size: 12px; color:rgb(14, 12, 19);">This is an automated email from Volt, please do not reply.</p>
   </div>
 `;
 
   const mailOptions = {
     from: EMAIL_ADDRESS,
     to: email,
-    subject: "Volt account recovery",
+    subject: "Volt Password Reset Request",
     html: emailContent,
   };
 

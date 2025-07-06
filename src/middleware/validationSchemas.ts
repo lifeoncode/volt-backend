@@ -14,14 +14,8 @@ export const loginValidationSchema = [
 
 export const recoverValidationSchema = [body("email").isEmail().withMessage("Valid email required")];
 
-export const accountRecoveryValidationSchema = [
-  body("email").isEmail().withMessage("Valid email required"),
-  body("otp").isLength({ min: 4 }).withMessage("Valid OTP required"),
-];
-
 export const passwordResetValidationSchema = [
   body("email").isEmail().withMessage("Valid email required"),
-  body("otp").isLength({ min: 4 }).withMessage("Valid OTP required"),
   body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters"),
 ];
 

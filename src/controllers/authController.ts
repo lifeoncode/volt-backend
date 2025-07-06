@@ -184,32 +184,3 @@ export const recover = async (req: Request, res: Response): Promise<void> => {
   res.status(200).json({ message: "Recovery email sent" });
   logger.info(`${email} - account recovery attempt`);
 };
-
-/**
- * @controller validateRecovery
- *
- * @description
- * Handles the validation of OTP to recover the user's account.
- *
- * @param {Request} req - Express request object. Expects {email, otp} in req.body
- * @param {Response} res - Express response object. Responds with validation success or failure
- *
- * @returns {void}
- *
- * @sideEffects
- * Logs the creation of a new user account with the user's email address on success. Logs the error message on failure.
- */
-export const validateRecovery = async (req: Request, res: Response): Promise<void> => {
-  const { email, otp } = req.body;
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const err = errors.array()[0];
-    if (!err.value) throw new BadRequestError(err.msg);
-    throw new UnprocessableEntityError(err.msg);
-  }
-
-  const verified = await verifyOTPService(email, otp);
-
-  res.status(200).json({ message: verified });
-  logger.info(verified);
-};
