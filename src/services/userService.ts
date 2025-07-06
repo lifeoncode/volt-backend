@@ -77,7 +77,7 @@ export const updateUserPasswordService = async (email: string, newPassword: stri
  */
 export const deleteUserService = async (userId: string): Promise<User> => {
   await getUserService(userId);
-  await prisma.passwordCredential.deleteMany({ where: { user_id: userId } });
+  await prisma.secret.deleteMany({ where: { user_id: userId } });
 
   return prisma.user.delete({ where: { id: userId } });
 };

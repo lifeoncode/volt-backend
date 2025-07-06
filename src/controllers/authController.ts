@@ -14,15 +14,10 @@ import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from "../middleware/authMiddlew
 import { JWTPayload } from "../util/types";
 import { getUserService } from "../services/userService";
 import crypto from "crypto";
-import {
-  BadGatewayError,
-  BadRequestError,
-  InternalServerError,
-  UnauthorizedError,
-  UnprocessableEntityError,
-} from "../middleware/errors";
+import { BadGatewayError, BadRequestError, UnauthorizedError, UnprocessableEntityError } from "../middleware/errors";
 const expressValidator = require("express-validator");
 const { validationResult } = expressValidator;
+
 /**
  * @controller register
  *
@@ -50,7 +45,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   const hashedPassword = bcrypt.hashSync(password, 10);
   await registerService(username, email, hashedPassword, secret);
 
-  res.status(201).json({ user: { username, email } });
+  res.status(201).json({ message: "New user registered", data: { username, email } });
   logger.info(`new user registered: ${email}`);
 };
 
@@ -96,7 +91,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     secure: true,
   });
 
-  res.status(200).json({ username: user.username, email: user.email, token: accessToken });
+  res
+    .status(200)
+    .json({ message: "Login successful", data: { username: user.username, email: user.email, token: accessToken } });
   logger.info(`${user.email} login success`);
 };
 
@@ -122,7 +119,7 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     path: "/",
   });
 
-  res.status(200).json("logged out");
+  res.status(200).json({ message: "Logout successful" });
   logger.info("logout success");
 };
 
@@ -151,7 +148,7 @@ export const refreshToken = async (req: Request, res: Response): Promise<void> =
 
   const { username, email } = await getUserService(req.user.userId);
 
-  res.status(200).json({ username, email, token: accessToken });
+  res.status(200).json({ message: "Access token refreshed", data: { username, email, token: accessToken } });
   logger.info("new access token generated");
 };
 
@@ -184,7 +181,7 @@ export const recover = async (req: Request, res: Response): Promise<void> => {
   const emailSent = await sendEmail(email, otp as string);
   if (!emailSent) throw new BadGatewayError("Could not send email");
 
-  res.status(200).json("recovery email sent");
+  res.status(200).json({ message: "Recovery email sent" });
   logger.info(`${email} - account recovery attempt`);
 };
 
@@ -213,6 +210,6 @@ export const validateRecovery = async (req: Request, res: Response): Promise<voi
 
   const verified = await verifyOTPService(email, otp);
 
-  res.status(200).json(verified);
+  res.status(200).json({ message: verified });
   logger.info(verified);
 };

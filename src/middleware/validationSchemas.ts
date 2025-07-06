@@ -25,7 +25,7 @@ export const passwordResetValidationSchema = [
   body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters"),
 ];
 
-export const passwordCredentialValidationSchema = [
+export const secretValidationSchema = [
   body("service").notEmpty().withMessage("Service required"),
   body("service_user_id").notEmpty().withMessage("Service_user_id required"),
   body("password").notEmpty().withMessage("Password required"),

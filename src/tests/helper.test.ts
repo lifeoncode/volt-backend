@@ -1,14 +1,14 @@
-import { PasswordCredential } from "../util/types";
 import {
   decryptData,
-  decryptPasswordCredential,
-  encryptPasswordCredential,
+  decryptSecret,
+  encryptSecret,
   generateOTP,
   generateSecretKey,
   resolveErrorType,
-  updateExistingCredential,
+  updateExistingSecret,
 } from "../util/helper";
 import { encryptData } from "../util/helper";
+import { Secret } from "../util/types";
 
 describe("generateSecretKey", () => {
   it("should return a 64-character hex string", () => {
@@ -28,15 +28,15 @@ describe("encryptData", () => {
   const secretKey = generateSecretKey();
 
   it("should throw an error if data is undefined", () => {
-    expect(() => encryptData(undefined, secretKey)).toThrow("No data provided for encryption");
+    expect(() => encryptData(undefined, secretKey)).toThrow("No data to encrypt");
   });
 
   it("should throw an error if data is null", () => {
-    expect(() => encryptData(null, secretKey)).toThrow("No data provided for encryption");
+    expect(() => encryptData(null, secretKey)).toThrow("No data to encrypt");
   });
 
   it("should throw an error if data is an empty string", () => {
-    expect(() => encryptData("", secretKey)).toThrow("No data provided for encryption");
+    expect(() => encryptData("", secretKey)).toThrow("No data to encrypt");
   });
 
   it("should return an encrypted string", () => {
@@ -57,28 +57,28 @@ test("decryptData should correctly decrypt encrypted string", () => {
 });
 
 test("decryptData should throw error when no data is provided", () => {
-  expect(() => decryptData(undefined, secret)).toThrow("No data provided for decryption");
+  expect(() => decryptData(undefined, secret)).toThrow("No data to decrypt");
 });
 
-test("encryptPasswordCredential should encrypt sensitive fields", () => {
-  const credential: PasswordCredential = {
+test("encryptSecret should encrypt sensitive fields", () => {
+  const credential: Secret = {
     service: "facebook",
     service_user_id: "rick_sanchez",
     password: "password123",
   };
-  const encrypted = encryptPasswordCredential(credential, secret);
+  const encrypted = encryptSecret(credential, secret);
   expect(encrypted.password).not.toBe("password123");
   expect(encrypted.service_user_id).not.toBe("rick_sanchez");
 });
 
-test("decryptPasswordCredential should decrypt encrypted fields", () => {
-  const original: PasswordCredential = {
+test("decryptSecret should decrypt encrypted fields", () => {
+  const original: Secret = {
     service: "facebook",
     service_user_id: "rick_sanchez",
     password: "password123",
   };
-  const encrypted = encryptPasswordCredential(original, secret);
-  const decrypted = decryptPasswordCredential(encrypted, secret);
+  const encrypted = encryptSecret(original, secret);
+  const decrypted = decryptSecret(encrypted, secret);
   expect(decrypted).toEqual(original);
 });
 
@@ -95,15 +95,15 @@ test("resolveErrorType should return 500 for other messages", () => {
 });
 
 test("updateExistingCredential updates and encrypts relevant fields", () => {
-  const oldCred: PasswordCredential = { service: "facebook", service_user_id: "rick_sanchez", password: "password123" };
-  const newCred: PasswordCredential = {
+  const oldCred: Secret = { service: "facebook", service_user_id: "rick_sanchez", password: "password123" };
+  const newCred: Secret = {
     service: "facebook",
     service_user_id: "rick_sanchez",
     password: "pass000",
     notes: "my old facebook profile",
   };
 
-  const updated = updateExistingCredential(newCred, oldCred, secret);
+  const updated = updateExistingSecret(newCred, oldCred, secret);
   expect(Object.keys(updated)).toContain("password");
   expect(Object.keys(updated)).toContain("notes");
   expect(Object.keys(updated)).toContain("service");

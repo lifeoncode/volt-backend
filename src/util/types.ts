@@ -13,7 +13,7 @@ export type JWTPayload = {
   email: string;
 };
 
-export type PasswordCredential = {
+export type Secret = {
   id?: string;
   user?: any;
   user_id?: string;

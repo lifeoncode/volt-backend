@@ -1,4 +1,4 @@
-import { PasswordCredential } from "./types";
+import { Secret } from "./types";
 import CryptoJS from "crypto-js";
 import nodemailer from "nodemailer";
 import logger from "../middleware/logger";
@@ -23,7 +23,7 @@ export const isDev = (): boolean => {
 };
 
 /**
- * @func isDev
+ * @func isProd
  *
  * @description
  * Checks if application is running in production environment.
@@ -80,17 +80,17 @@ export const decryptData = (data: string | undefined | null, secretKey: string):
 };
 
 /**
- * @func encryptPasswordCredential
+ * @func encryptSecret
  *
  * @description
- * encrypts PasswordCredential.
+ * encrypts Secret.
  *
- * @param {String} data - PasswordCredential to encrypt
+ * @param {String} data - Secret to encrypt
  * @param {String} secret - Secret to perform encryption
  *
- * @returns {PasswordCredential}
+ * @returns {Secret}
  */
-export const encryptPasswordCredential = (data: PasswordCredential, secret: string): PasswordCredential => {
+export const encryptSecret = (data: Secret, secret: string): Secret => {
   data.password = encryptData(data.password, secret);
   data.service_user_id = encryptData(data.service_user_id, secret);
 
@@ -98,19 +98,20 @@ export const encryptPasswordCredential = (data: PasswordCredential, secret: stri
 };
 
 /**
- * @func decryptPasswordCredential
+ * @func decryptSecret
  *
  * @description
- * decrypts PasswordCredential.
+ * decrypts Secret.
  *
- * @param {String} data - PasswordCredential to decrypt
+ * @param {String} data - Secret to decrypt
  * @param {String} secret - Secret to perform decryption
  *
- * @returns {PasswordCredential}
+ * @returns {Secret}
  */
-export const decryptPasswordCredential = (data: PasswordCredential, secret: string): PasswordCredential => {
+export const decryptSecret = (data: Secret, secret: string): Secret => {
   data.password = decryptData(data.password, secret);
   data.service_user_id = decryptData(data.service_user_id, secret);
+  data.notes = decryptData(data.notes, secret);
 
   return data;
 };
@@ -134,25 +135,25 @@ export const resolveErrorType = (errorMessage: string): number => {
 };
 
 /**
- * @func updateExistingCredential
+ * @func updateExistingSecret
  *
  * @description
- * Resolves PasswordCredential attributes updating.
+ * Resolves Secret attributes updating.
  *
- * @param {PasswordCredential} newCredential - New PasswordCredential attributes
- * @param {PasswordCredential} newCredential - Existing PasswordCredential attributes
+ * @param {Secret} newSecret - New Secret attributes
+ * @param {Secret} oldSecret - Existing Secret attributes
  *
  * @returns {Record<string, unknown>}
  */
-export const updateExistingCredential = (
-  newCredential: PasswordCredential,
-  oldCredential: PasswordCredential,
+export const updateExistingSecret = (
+  newSecret: Secret,
+  oldSecret: Secret,
   secretKey: string
 ): Record<string, unknown> => {
   const credentials: string[] = [];
   const result: Record<string, unknown> = {};
 
-  for (let [key, value] of Object.entries(newCredential)) {
+  for (let [key, value] of Object.entries(newSecret)) {
     if (value) {
       credentials.push(`${key}:${encryptData(value, secretKey)}`);
     }

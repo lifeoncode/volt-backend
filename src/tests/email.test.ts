@@ -8,7 +8,7 @@ jest.mock("nodemailer", () => ({
 }));
 
 test("sendEmail should return true on success", async () => {
-  const result = await sendEmail("test@example.com", "1234");
+  const result = await sendEmail("sanchez@email.com", "1234");
   expect(result).toBe(true);
 });
 
@@ -17,6 +17,6 @@ test("sendEmail should return false on failure", async () => {
     sendMail: jest.fn().mockRejectedValue(new Error("failed")),
   });
 
-  const result = await sendEmail("test@example.com", "1234");
+  const result = await sendEmail("sanchez@email.com", "1234");
   expect(result).toBe(false);
 });

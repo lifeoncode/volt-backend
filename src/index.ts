@@ -8,7 +8,7 @@ import { rateLimit } from "express-rate-limit";
 import { errorHandler, NotFoundError } from "./middleware/errors";
 import statusRoute from "./routes/statusRoute";
 import authRoutes from "./routes/authRoute";
-import passwordRoutes from "./routes/passwordRoute";
+import secretRoute from "./routes/secretRoute";
 import userRoutes from "./routes/userRoute";
 
 export const app = express();
@@ -33,7 +33,7 @@ app.use(limiter);
 
 app.use("/volt/api/status", statusRoute);
 app.use("/volt/api/auth", authRoutes);
-app.use("/volt/api/password", passwordRoutes);
+app.use("/volt/api/secret", secretRoute);
 app.use("/volt/api/user", userRoutes);
 
 app.use(() => {
