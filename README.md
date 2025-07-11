@@ -189,27 +189,38 @@ Powered by Prisma.
 ```prisma
 
 model User {
-    id String               @id @default(uuid()) @db.Uuid
-    username String         @unique
-    email String            @unique
-    password String
-    secret_key String
-    recovery_otp String?
-    createdAt DateTime      @default(now())
-    updatedAt DateTime      @updatedAt
-    PasswordCredential      PasswordCredential[]
+  id                 String               @id @default(uuid()) @db.Uuid
+  username           String               @unique
+  email              String               @unique
+  password           String
+  secret_key         String
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  Secret             Secret[]
+  Vault              Vault[]
 }
 
-model PasswordCredential {
-    id String           @id @default(uuid()) @db.Uuid
-    user_id String      @db.Uuid
-    user User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
-    service String
-    service_user_id String
-    password String
-    notes String?
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
+model Secret {
+  id              String    @id @default(uuid()) @db.Uuid
+  user_id         String    @db.Uuid
+  user            User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  service         String
+  service_user_id String
+  password        String
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Vault {
+  id              String    @id @default(uuid()) @db.Uuid
+  user_id         String    @db.Uuid
+  user            User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  secrets         String[]
+  label           String    @unique
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 
 ```
