@@ -122,6 +122,6 @@ export const resetUserPassword = async (req: Request, res: Response) => {
   const hashedPassword = bcrypt.hashSync(password, 10);
   await updateUserPasswordService(email, hashedPassword);
 
-  res.status(200).json("password reset successful");
+  res.status(200).json({ message: "Password has been reset" });
   logger.info(`user: ${email} password changed`);
 };

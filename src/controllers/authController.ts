@@ -1,13 +1,7 @@
 import { Request, Response } from "express";
-import { generateOTP, generateSecretKey, resolveErrorType, sendEmail } from "../util/helper";
+import { generateSecretKey, sendEmail } from "../util/helper";
 import bcrypt from "bcryptjs";
-import {
-  registerService,
-  loginService,
-  recoverService,
-  verifyOTPService,
-  storeRecoveryOTPService,
-} from "../services/authService";
+import { registerService, loginService, recoverService } from "../services/authService";
 import logger from "../middleware/logger";
 import jwt from "jsonwebtoken";
 import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from "../middleware/authMiddleware";
@@ -176,9 +170,8 @@ export const recover = async (req: Request, res: Response): Promise<void> => {
   }
 
   await recoverService(email);
-  const otp = await storeRecoveryOTPService(email, generateOTP());
 
-  const emailSent = await sendEmail(email, otp as string);
+  const emailSent = await sendEmail(email);
   if (!emailSent) throw new BadGatewayError("Could not send email");
 
   res.status(200).json({ message: "Recovery email sent" });

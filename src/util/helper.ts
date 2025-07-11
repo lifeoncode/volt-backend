@@ -169,37 +169,19 @@ export const updateExistingSecret = (
 };
 
 /**
- * @func generateOTP
- *
- * @description
- * Generates a  4-digit pin.
- *
- * @returns {String}
- */
-export const generateOTP = (): string => {
-  let otp = "";
-  for (let i = 0; i < 4; i++) {
-    otp += Math.floor(Math.random() * 10);
-  }
-
-  return otp;
-};
-
-/**
  * @func sendEmail
  *
  * @description
  * Sends email to User email address for account recovery.
  *
  * @param {String} email - User email
- * @param {String} otp - Generated 4-digit pin
  *
  * @returns {boolean}
  *
  * @sideEffects
  * Logs email event on success. Logs error message on failure
  */
-export const sendEmail = async (email: string, otp: string): Promise<boolean> => {
+export const sendEmail = async (email: string): Promise<boolean> => {
   const resetLink: string = isDev() ? "http://localhost:5173/recover/reset" : "https://voltpasswords.xyz/recover/reset";
 
   const transporter = nodemailer.createTransport({
