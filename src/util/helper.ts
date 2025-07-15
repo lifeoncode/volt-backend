@@ -109,9 +109,11 @@ export const encryptSecret = (data: Secret, secret: string): Secret => {
  * @returns {Secret}
  */
 export const decryptSecret = (data: Secret, secret: string): Secret => {
+  console.log(data);
+
   data.password = decryptData(data.password, secret);
   data.service_user_id = decryptData(data.service_user_id, secret);
-  data.notes = decryptData(data.notes, secret);
+  if (data.notes) data.notes = decryptData(data.notes, secret);
 
   return data;
 };
