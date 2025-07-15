@@ -197,7 +197,6 @@ model User {
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
   Secret             Secret[]
-  Vault              Vault[]
 }
 
 model Secret {
@@ -207,17 +206,6 @@ model Secret {
   service         String
   service_user_id String
   password        String
-  notes           String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-}
-
-model Vault {
-  id              String    @id @default(uuid()) @db.Uuid
-  user_id         String    @db.Uuid
-  user            User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  secrets         String[]
-  label           String    @unique
   notes           String?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt

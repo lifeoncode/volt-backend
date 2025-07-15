@@ -79,12 +79,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
-  res.cookie("csrf_token", csrfToken, {
-    httpOnly: false,
-    sameSite: "strict",
-    secure: true,
-  });
-
   res
     .status(200)
     .json({ message: "Login successful", data: { username: user.username, email: user.email, token: accessToken } });
@@ -173,6 +167,14 @@ export const recover = async (req: Request, res: Response): Promise<void> => {
 
   const emailSent = await sendEmail(email);
   if (!emailSent) throw new BadGatewayError("Could not send email");
+
+  res.cookie("passwordResetToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+    path: "/",
+    maxAge: 3600,
+  });
 
   res.status(200).json({ message: "Recovery email sent" });
   logger.info(`${email} - account recovery attempt`);

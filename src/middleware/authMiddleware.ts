@@ -21,14 +21,6 @@ export const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET!;
  */
 export const authenticate = (req: Request, res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
-  // const csrfHeader = req.headers["x-csrf-token"];
-  // const csrfCookie = req.cookies["csrf_token"];
-
-  // if (!csrfHeader || !csrfCookie || csrfHeader !== csrfCookie) {
-  //   logger.error("Forbidden");
-  //   throw new UnauthorizedError();
-  // }
-
   if (!authHeader?.startsWith("Bearer ")) {
     logger.error("Unauthorized");
     throw new UnauthorizedError();
@@ -43,3 +35,5 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
     throw new UnauthorizedError();
   }
 };
+
+export const authenticatePasswordReset = (req: Request, res: Response, next: NextFunction): void => {};
