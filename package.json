@@ -58,6 +58,7 @@
     "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^7.0.3",
+    "resend": "^4.7.0",
     "volt-backend": "file:",
     "winston": "^3.17.0"
   }

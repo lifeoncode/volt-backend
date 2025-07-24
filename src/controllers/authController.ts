@@ -1,7 +1,13 @@
 import { Request, Response } from "express";
-import { generateSecretKey, sendEmail } from "../util/helper";
+import { generateSecretKey } from "../util/helper";
 import bcrypt from "bcryptjs";
-import { registerService, loginService, recoverService } from "../services/authService";
+import {
+  registerService,
+  loginService,
+  recoverService,
+  createUserTokenService,
+  verifyUserTokenService,
+} from "../services/authService";
 import logger from "../middleware/logger";
 import jwt from "jsonwebtoken";
 import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from "../middleware/authMiddleware";
@@ -9,6 +15,7 @@ import { JWTPayload } from "../util/types";
 import { getUserService } from "../services/userService";
 import crypto from "crypto";
 import { BadGatewayError, BadRequestError, UnauthorizedError, UnprocessableEntityError } from "../middleware/errors";
+import { passwordResetTemplate, sendEmail } from "../lib/email";
 const expressValidator = require("express-validator");
 const { validationResult } = expressValidator;
 
@@ -69,7 +76,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   const user = await loginService(email, password);
   const accessToken = jwt.sign({ userId: user.id, email: user.email }, JWT_ACCESS_SECRET, { expiresIn: "15m" });
   const refreshToken = jwt.sign({ userId: user.id, email: user.email }, JWT_REFRESH_SECRET, { expiresIn: "7d" });
-  const csrfToken = crypto.randomBytes(32).toString("hex");
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
@@ -163,19 +169,25 @@ export const recover = async (req: Request, res: Response): Promise<void> => {
     throw new UnprocessableEntityError(err.msg);
   }
 
-  await recoverService(email);
+  const user = await recoverService(email);
 
-  const emailSent = await sendEmail(email);
-  if (!emailSent) throw new BadGatewayError("Could not send email");
-
-  res.cookie("passwordResetToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
-    path: "/",
-    maxAge: 3600,
+  const now = new Date();
+  const newToken = await createUserTokenService(user.id, {
+    token: generateSecretKey(),
+    expires_at: new Date(now.getTime() + 24 * 60 * 60 * 1000),
   });
+
+  const emailSent = sendEmail(email, passwordResetTemplate(newToken.token));
+  if (!emailSent) throw new BadGatewayError("Could not send email");
 
   res.status(200).json({ message: "Recovery email sent" });
   logger.info(`${email} - account recovery attempt`);
+};
+
+export const verifyUserToken = async (req: Request, res: Response) => {
+  const { token } = req.query;
+  const verifiedToken = await verifyUserTokenService(token as string);
+
+  res.status(200).json({ message: "Valid token", data: { token: verifiedToken } });
+  logger.info(`Valid user token`);
 };

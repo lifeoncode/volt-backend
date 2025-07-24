@@ -110,7 +110,7 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
  * @sideEffects
  * Logs the password reset event with the user's email address on success. Logs the error message on failure.
  */
-export const resetUserPassword = async (req: Request, res: Response) => {
+export const resetUserPassword = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

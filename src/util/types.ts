@@ -24,3 +24,14 @@ export type Secret = {
   createdAt?: string | Date;
   updatedAt?: string | Date;
 };
+
+export type UserToken = {
+  id?: string;
+  user?: any;
+  user_id?: string;
+  token: string;
+  expires_at: string | Date;
+  used_at?: string | Date;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+};

@@ -1,7 +1,14 @@
 import { PrismaClient } from "../../generated/prisma";
 import bcrypt from "bcryptjs";
-import { User } from "../util/types";
-import { BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../middleware/errors";
+import { User, UserToken } from "../util/types";
+import {
+  BadRequestError,
+  ConflictError,
+  InternalServerError,
+  NotFoundError,
+  UnauthorizedError,
+} from "../middleware/errors";
+import { getUserService } from "./userService";
 
 const prisma = new PrismaClient();
 
@@ -61,8 +68,32 @@ export const loginService = async (email: string, password: string): Promise<Rec
 };
 
 export const recoverService = async (email: string) => {
-  const accountFound = await prisma.user.findUnique({ where: { email } });
-  if (!accountFound) throw new NotFoundError("User not found");
+  const userFound = await prisma.user.findUnique({ where: { email } });
+  if (!userFound) throw new NotFoundError("User not found");
 
-  return email;
+  return userFound;
+};
+
+export const createUserTokenService = async (userId: string, userToken: UserToken) => {
+  const exists = await prisma.userTokens.findFirst({ where: { token: userToken.token } });
+  if (exists && exists.used_at) throw new ConflictError("Token already used");
+
+  const newToken = await prisma.userTokens.create({
+    data: {
+      token: userToken.token,
+      expires_at: userToken.expires_at,
+      user: { connect: { id: userId } },
+    },
+  });
+
+  return newToken;
+};
+
+export const verifyUserTokenService = async (token: string) => {
+  const foundToken = await prisma.userTokens.findFirst({ where: { token } });
+  if (!foundToken) throw new NotFoundError("Token not found");
+  if (foundToken?.used_at) throw new ConflictError("Token has already been used");
+  if (foundToken.expires_at < new Date()) throw new UnauthorizedError("Token has expired");
+
+  return foundToken.token;
 };
