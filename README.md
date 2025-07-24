@@ -197,6 +197,7 @@ model User {
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
   Secret             Secret[]
+  UserTokens         UserTokens[]
 }
 
 model Secret {
@@ -209,6 +210,17 @@ model Secret {
   notes           String?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+}
+
+model UserTokens {
+  id          String    @id @default(uuid()) @db.Uuid
+  user_id     String    @db.Uuid
+  user        User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  token       String
+  expires_at  DateTime
+  used_at     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 ```
