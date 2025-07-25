@@ -172,7 +172,7 @@ export const recover = async (req: Request, res: Response): Promise<void> => {
   const user = await recoverService(email);
 
   const now = new Date();
-  const newToken = await createUserTokenService(user.id, {
+  const newToken = await createUserTokenService(user?.id as string, {
     token: generateSecretKey(),
     expires_at: new Date(now.getTime() + 24 * 60 * 60 * 1000),
   });
@@ -184,6 +184,17 @@ export const recover = async (req: Request, res: Response): Promise<void> => {
   logger.info(`${email} - account recovery attempt`);
 };
 
+/**
+ * @controller verifyUserToken
+ *
+ * @description
+ * Handles verification of user token when user clicks a link from their email
+ *
+ * @param {Request} req - Express request object. Expects an email in req.body
+ * @param {Response} res - Express response object. Responds with verified token
+ *
+ * @returns {void}
+ */
 export const verifyUserToken = async (req: Request, res: Response) => {
   const { token } = req.query;
   const verifiedToken = await verifyUserTokenService(token as string);

@@ -67,14 +67,35 @@ export const loginService = async (email: string, password: string): Promise<Rec
   return { id: user.id, username: user.username, email: user.email };
 };
 
-export const recoverService = async (email: string) => {
+/**
+ * @service recoverService
+ *
+ * @description
+ * Handles User account recovery by retrieving the relevant user by email
+ *
+ * @param {string} email - User username
+ *
+ * @returns {User}
+ */
+export const recoverService = async (email: string): Promise<User | null> => {
   const userFound = await prisma.user.findUnique({ where: { email } });
   if (!userFound) throw new NotFoundError("User not found");
 
   return userFound;
 };
 
-export const createUserTokenService = async (userId: string, userToken: UserToken) => {
+/**
+ * @service createUserTokenService
+ *
+ * @description
+ * Handles storing a user generated token for password reset or account verification
+ *
+ * @param {string} userId - User's id
+ * @param {UserToken} userToken - The generated token
+ *
+ * @returns {UserToken}
+ */
+export const createUserTokenService = async (userId: string, userToken: UserToken): Promise<UserToken> => {
   const exists = await prisma.userTokens.findFirst({ where: { token: userToken.token } });
   if (exists && exists.used_at) throw new ConflictError("Token already used");
 
@@ -86,10 +107,20 @@ export const createUserTokenService = async (userId: string, userToken: UserToke
     },
   });
 
-  return newToken;
+  return newToken as UserToken;
 };
 
-export const verifyUserTokenService = async (token: string) => {
+/**
+ * @service verifyUserTokenService
+ *
+ * @description
+ * Handles verifying a user generated token for password reset or account verification
+ *
+ * @param {string} token - The user token to verify
+ *
+ * @returns {string}
+ */
+export const verifyUserTokenService = async (token: string): Promise<string> => {
   const foundToken = await prisma.userTokens.findFirst({ where: { token } });
   if (!foundToken) throw new NotFoundError("Token not found");
   if (foundToken?.used_at) throw new ConflictError("Token has already been used");

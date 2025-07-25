@@ -35,5 +35,3 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
     throw new UnauthorizedError();
   }
 };
-
-export const authenticatePasswordReset = (req: Request, res: Response, next: NextFunction): void => {};
