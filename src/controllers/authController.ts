@@ -13,9 +13,14 @@ import jwt from "jsonwebtoken";
 import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from "../middleware/authMiddleware";
 import { JWTPayload } from "../util/types";
 import { getUserService } from "../services/userService";
-import crypto from "crypto";
-import { BadGatewayError, BadRequestError, UnauthorizedError, UnprocessableEntityError } from "../middleware/errors";
-import { passwordResetTemplate, sendEmail } from "../lib/email";
+import {
+  BadGatewayError,
+  BadRequestError,
+  NotFoundError,
+  UnauthorizedError,
+  UnprocessableEntityError,
+} from "../middleware/errors";
+import { passwordResetTemplate, sendEmail, verificationEmailTemplate } from "../lib/email";
 const expressValidator = require("express-validator");
 const { validationResult } = expressValidator;
 
@@ -174,7 +179,7 @@ export const recover = async (req: Request, res: Response): Promise<void> => {
   const now = new Date();
   const newToken = await createUserTokenService(user?.id as string, {
     token: generateSecretKey(),
-    expires_at: new Date(now.getTime() + 24 * 60 * 60 * 1000),
+    expires_at: new Date(now.getTime() + 1 * 60 * 60 * 1000),
   });
 
   const emailSent = sendEmail(email, passwordResetTemplate(newToken.token));
@@ -190,15 +195,47 @@ export const recover = async (req: Request, res: Response): Promise<void> => {
  * @description
  * Handles verification of user token when user clicks a link from their email
  *
- * @param {Request} req - Express request object. Expects an email in req.body
+ * @param {Request} req - Express request object. Expects a token in req.query
  * @param {Response} res - Express response object. Responds with verified token
  *
  * @returns {void}
  */
-export const verifyUserToken = async (req: Request, res: Response) => {
+export const verifyUserToken = async (req: Request, res: Response): Promise<void> => {
   const { token } = req.query;
+  if (!token) throw new NotFoundError("Token not found");
+
   const verifiedToken = await verifyUserTokenService(token as string);
 
   res.status(200).json({ message: "Valid token", data: { token: verifiedToken } });
   logger.info(`Valid user token`);
+};
+
+/**
+ * @controller verifyUserAccount
+ *
+ * @description
+ * Handles verification of user account
+ *
+ * @param {Request} req - Express request object.
+ * @param {Response} res - Express response object.
+ *
+ * @returns {void}
+ */
+export const verifyUserAccount = async (req: Request, res: Response): Promise<void> => {
+  const userId: string | undefined = req.user?.userId;
+  if (!userId) throw new NotFoundError("User id not found");
+
+  const { email } = await getUserService(userId);
+
+  const now = new Date();
+  const newToken = await createUserTokenService(userId, {
+    token: generateSecretKey(),
+    expires_at: new Date(now.getTime() + 24 * 60 * 60 * 1000),
+  });
+
+  const emailSent = sendEmail(email, verificationEmailTemplate(newToken.token));
+  if (!emailSent) throw new BadGatewayError("Could not send email");
+
+  res.status(200).json({ message: "ACcount verification email sent" });
+  logger.info(`${email} - account verification attempt`);
 };

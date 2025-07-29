@@ -41,16 +41,16 @@ export const createSecret = async (req: Request, res: Response): Promise<void> =
     throw new UnprocessableEntityError(err.msg);
   }
 
-  const { secret_key: secret } = await getUserService(userId);
-  const { service_user_id: encryptedServiceId, password: encryptedPassword } = encryptSecret(
-    { service, service_user_id, password, notes, user: userId },
-    secret as string
-  );
+  // const { secret_key: secret } = await getUserService(userId);
+  // const { service_user_id: encryptedServiceId, password: encryptedPassword } = encryptSecret(
+  //   { service, service_user_id, password, notes, user: userId },
+  //   secret as string
+  // );
 
   const newSecret = await createSecretService(userId, {
     service,
-    service_user_id: encryptedServiceId,
-    password: encryptedPassword,
+    service_user_id,
+    password,
     user: userId,
     notes,
   });
@@ -78,11 +78,10 @@ export const getAllSecrets = async (req: Request, res: Response): Promise<void> 
   if (!userId) throw new BadRequestError("User session not found");
 
   const secrets = await getAllSecretsService(userId);
-
-  const { secret_key } = await getUserService(userId);
-  for (let secret of secrets) {
-    decryptSecret(secret, secret_key as string);
-  }
+  // const { secret_key } = await getUserService(userId);
+  // for (let secret of secrets) {
+  //   decryptSecret(secret, secret_key as string);
+  // }
 
   res.status(200).json({ message: "Successfully fetched secrets", data: secrets });
   logger.info(`user: ${userId} fetched all secrets`);
@@ -109,8 +108,8 @@ export const getSecret = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   const secret = await getSecretService(userId, id);
 
-  const { secret_key } = await getUserService(userId);
-  decryptSecret(secret, secret_key as string);
+  // const { secret_key } = await getUserService(userId);
+  // decryptSecret(secret, secret_key as string);
 
   res.status(200).json({ message: "Successfully fetched secret", data: secret });
   logger.info(`user: ${userId} fetched a secret`);
@@ -140,11 +139,11 @@ export const updateSecret = async (req: Request, res: Response): Promise<void> =
 
   const newSecretData = { service, service_user_id, password, notes };
 
-  const { secret_key } = await getUserService(userId);
+  // const { secret_key } = await getUserService(userId);
   const existingSecret = await getSecretService(userId, id);
 
-  const decryptedSecret = decryptSecret(existingSecret, secret_key as string);
-  const newSecret = updateExistingSecret(newSecretData, decryptedSecret, secret_key as string);
+  // const decryptedSecret = decryptSecret(existingSecret, secret_key as string);
+  const newSecret = updateExistingSecret(newSecretData, existingSecret);
 
   const updatedSecret = await updateSecretService(userId, id, newSecret);
 

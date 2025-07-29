@@ -3,6 +3,7 @@ export type User = {
   username: string;
   email: string;
   password: string;
+  is_verified: Boolean;
   secret_key?: string;
   createdAt?: Date | string;
   updatedAt?: Date | string;

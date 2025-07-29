@@ -1,6 +1,6 @@
 import { PrismaClient } from "../../generated/prisma";
 import { ConflictError, NotFoundError } from "../middleware/errors";
-import { decryptSecret } from "../util/helper";
+// import { decryptSecret } from "../util/helper";
 import { Secret } from "../util/types";
 import { getUserService } from "./userService";
 
@@ -17,11 +17,11 @@ const prisma = new PrismaClient();
  * @returns {Secret}
  */
 export const createSecretService = async (userId: string, data: Secret): Promise<Secret> => {
-  const { secret_key: secret } = await getUserService(userId);
-  const decryptedData = decryptSecret(data, secret as string);
+  // const { secret_key: secret } = await getUserService(userId);
+  // const decryptedData = decryptSecret(data, secret as string);
 
   const existingSecret = await prisma.secret.findFirst({
-    where: { service: decryptedData.service, service_user_id: decryptedData.service_user_id },
+    where: { service: data.service, service_user_id: data.service_user_id },
   });
   if (existingSecret) throw new ConflictError("Secret already exists");
 
